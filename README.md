@@ -12,4 +12,5 @@ Here are the visuals of Hotel Management System in action:
 ![image alt](https://github.com/ttahsin124-wq/Java-project-Hotel-Management-System-/blob/main/Screenshot%202026-01-15%20214022.png?raw=true)
 ![image alt](https://github.com/ttahsin124-wq/Java-project-Hotel-Management-System-/blob/main/Screenshot%202026-01-15%20214046.png?raw=true)
 ![image alt](https://github.com/ttahsin124-wq/Java-project-Hotel-Management-System-/blob/main/Screenshot%202026-01-15%20214103.png?raw=true)
+![image alt](https://github.com/ttahsin124-wq/Java-project-Hotel-Management-System-/blob/main/Screenshot%202026-01-15%20214120.png?raw=true)
 ![image alt](
