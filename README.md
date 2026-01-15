@@ -7,3 +7,5 @@ Detailed Feature Breakdown:
 📅 Reservation and Booking System
 📊 Business Intelligence and Reporting
 ⚙️ System Configuration and Settings
+Here are the visuals of Hotel Management System in action:
+![image alt](https://raw.githubusercontent.com/ttahsin124-wq/Java-project-Hotel-Management-System-/22acdc5493703e052107e2b72b72e7b28c2f9344/Screenshot%202026-01-15%20214000.png)
