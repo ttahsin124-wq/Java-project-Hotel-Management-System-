@@ -5,19 +5,20 @@ import javax.swing.table.*;
 
 public class DriverPanel extends JPanel 
 {
-
     private DefaultTableModel model;
     private ArrayList<Driver> drivers;
     private JTextField nameField, ageField, companyField, carField, locationField;
     private JComboBox<Gender> genderCombo;
     private JButton addButton, editButton, deleteButton, clearButton;
     private int selectedRow = -1;
+    private FileUtil fileUtil; 
 
     public DriverPanel() 
     {
         setLayout(new BorderLayout());
         setBackground(UITheme.CARD_BG);
-        drivers = FileUtil.load("drivers.dat");
+        fileUtil = FileUtil.getInstance();
+        drivers = fileUtil.load("drivers.dat");
         JPanel headerPanel = new JPanel(new BorderLayout());
         headerPanel.setBackground(UITheme.DARK_BG);
         headerPanel.setBorder(BorderFactory.createEmptyBorder(15, 20, 15, 20));
@@ -49,6 +50,7 @@ public class DriverPanel extends JPanel
             panel.getBorder(),
             BorderFactory.createEmptyBorder(20, 20, 20, 20)
         ));
+        
         nameField = UITheme.createStyledTextField();
         ageField = UITheme.createStyledTextField();
         companyField = UITheme.createStyledTextField();
@@ -56,6 +58,7 @@ public class DriverPanel extends JPanel
         locationField = UITheme.createStyledTextField();
         genderCombo = new JComboBox<>(Gender.values());
         styleComboBox(genderCombo);
+        
         panel.add(createFormRow("Name:", nameField));
         panel.add(Box.createRigidArea(new Dimension(0, 12)));
         panel.add(createFormRow("Age:", ageField));
@@ -68,22 +71,28 @@ public class DriverPanel extends JPanel
         panel.add(Box.createRigidArea(new Dimension(0, 12)));
         panel.add(createFormRow("Location:", locationField));
         panel.add(Box.createRigidArea(new Dimension(0, 25)));
+        
         JPanel buttonPanel = new JPanel(new GridLayout(2, 2, 10, 10));
         buttonPanel.setBackground(UITheme.CARD_BG);
+        
         addButton = UITheme.createStyledButton("Add Driver", UITheme.SUCCESS_COLOR);
         editButton = UITheme.createStyledButton("Edit Driver", UITheme.WARNING_COLOR);
         deleteButton = UITheme.createStyledButton("Delete Driver", UITheme.DANGER_COLOR);
         clearButton = UITheme.createStyledButton("Clear Form", new Color(100, 100, 100));
+        
         editButton.setEnabled(false);
         deleteButton.setEnabled(false);
+        
         addButton.addActionListener(e -> addDriver());
         editButton.addActionListener(e -> editDriver());
         deleteButton.addActionListener(e -> deleteDriver());
         clearButton.addActionListener(e -> clearForm());
+        
         buttonPanel.add(addButton);
         buttonPanel.add(editButton);
         buttonPanel.add(deleteButton);
         buttonPanel.add(clearButton);
+        
         panel.add(buttonPanel);
         return panel;
     }
@@ -92,11 +101,14 @@ public class DriverPanel extends JPanel
     {
         JPanel rowPanel = new JPanel(new BorderLayout(15, 0));
         rowPanel.setBackground(UITheme.CARD_BG);
+        
         JLabel lbl = new JLabel(label);
         lbl.setForeground(UITheme.TEXT_COLOR);
         lbl.setFont(UITheme.NORMAL_FONT);
         lbl.setPreferredSize(new Dimension(100, 30));
+        
         field.setPreferredSize(new Dimension(200, 35));
+        
         rowPanel.add(lbl, BorderLayout.WEST);
         rowPanel.add(field, BorderLayout.CENTER);
         return rowPanel;
@@ -132,11 +144,13 @@ public class DriverPanel extends JPanel
                 return false;
             }
         };
+        
         JTable table = new JTable(model);
         loadDriversToTable();
+        
         table.getSelectionModel().addListSelectionListener(e -> {
             if (!e.getValueIsAdjusting()) 
-                {
+            {
                 selectedRow = table.getSelectedRow();
                 if (selectedRow >= 0) 
                 {
@@ -154,6 +168,7 @@ public class DriverPanel extends JPanel
                 }
             }
         });
+        
         table.setBackground(UITheme.CARD_BG);
         table.setForeground(UITheme.TEXT_COLOR);
         table.setGridColor(new Color(70, 70, 70));
@@ -161,14 +176,19 @@ public class DriverPanel extends JPanel
         table.setFont(UITheme.SMALL_FONT);
         table.setSelectionBackground(UITheme.PRIMARY_COLOR);
         table.setSelectionForeground(Color.WHITE);
+        
         JTableHeader header = table.getTableHeader();
         header.setBackground(UITheme.SECONDARY_COLOR);
         header.setForeground(Color.WHITE);
         header.setFont(UITheme.NORMAL_FONT);
+        
         JScrollPane scrollPane = new JScrollPane(table);
         scrollPane.setBorder(BorderFactory.createTitledBorder(
-            BorderFactory.createLineBorder(UITheme.SECONDARY_COLOR, 2),"Driver List (" + drivers.size() + ")",0, 0, UITheme.HEADER_FONT, UITheme.TEXT_COLOR
+            BorderFactory.createLineBorder(UITheme.SECONDARY_COLOR, 2),
+            "Driver List (" + drivers.size() + ")",
+            0, 0, UITheme.HEADER_FONT, UITheme.TEXT_COLOR
         ));
+        
         return scrollPane;
     }
 
@@ -182,22 +202,29 @@ public class DriverPanel extends JPanel
             String company = companyField.getText().trim();
             String car = carField.getText().trim();
             String location = locationField.getText().trim();
+            
             if (name.isEmpty() || company.isEmpty() || car.isEmpty() || location.isEmpty()) 
             {
                 JOptionPane.showMessageDialog(this, "Please fill all fields!");
                 return;
             }
+            
             for (Driver d : drivers) 
             {
                 if (d.getName().equalsIgnoreCase(name) && d.getCarName().equalsIgnoreCase(car)) 
                 {
-                    JOptionPane.showMessageDialog(this,"Driver with name '" + name + "' and car '" + car + "' already exists!","Duplicate Driver",JOptionPane.WARNING_MESSAGE);
+                    JOptionPane.showMessageDialog(this,
+                        "Driver with name '" + name + "' and car '" + car + "' already exists!",
+                        "Duplicate Driver",
+                        JOptionPane.WARNING_MESSAGE);
                     return;
                 }
             }
+            
             Driver driver = new Driver(name, age, gender, company, car, location);
             drivers.add(driver);
-            FileUtil.save("drivers.dat", drivers);
+            fileUtil.save("drivers.dat", drivers);
+            
             model.addRow(new Object[]
             {
                 driver.getName(),
@@ -207,6 +234,7 @@ public class DriverPanel extends JPanel
                 driver.getCarName(),
                 driver.getLocation()
             });
+            
             clearForm();
             JOptionPane.showMessageDialog(this, "Driver added successfully!");
             
@@ -228,6 +256,7 @@ public class DriverPanel extends JPanel
             JOptionPane.showMessageDialog(this, "Please select a driver to edit!");
             return;
         }
+        
         try 
         {
             String name = nameField.getText().trim();
@@ -236,11 +265,13 @@ public class DriverPanel extends JPanel
             String company = companyField.getText().trim();
             String car = carField.getText().trim();
             String location = locationField.getText().trim();
+            
             if (name.isEmpty() || company.isEmpty() || car.isEmpty() || location.isEmpty()) 
             {
                 JOptionPane.showMessageDialog(this, "Please fill all fields!");
                 return;
             }
+            
             Driver driver = drivers.get(selectedRow);
             driver.setName(name);
             driver.setAge(age);
@@ -248,7 +279,7 @@ public class DriverPanel extends JPanel
             driver.setCarCompany(company);
             driver.setCarName(car);
             driver.setLocation(location);
-            FileUtil.save("drivers.dat", drivers);
+            fileUtil.save("drivers.dat", drivers);
             model.setValueAt(driver.getName(), selectedRow, 0);
             model.setValueAt(driver.getAge(), selectedRow, 1);
             model.setValueAt(driver.getGender(), selectedRow, 2);
@@ -271,6 +302,7 @@ public class DriverPanel extends JPanel
             JOptionPane.showMessageDialog(this, "Error: " + e.getMessage());
         }
     }
+    
     private void deleteDriver() 
     {
         if (selectedRow < 0) 
@@ -279,12 +311,16 @@ public class DriverPanel extends JPanel
             return;
         }
         
-        int confirm = JOptionPane.showConfirmDialog(this,"Are you sure you want to delete this driver?\nThis action cannot be undone.","Confirm Deletion",JOptionPane.YES_NO_OPTION,JOptionPane.WARNING_MESSAGE);
+        int confirm = JOptionPane.showConfirmDialog(this,
+            "Are you sure you want to delete this driver?\nThis action cannot be undone.",
+            "Confirm Deletion",
+            JOptionPane.YES_NO_OPTION,
+            JOptionPane.WARNING_MESSAGE);
         
         if (confirm == JOptionPane.YES_OPTION) 
-            {
+        {
             Driver deletedDriver = drivers.remove(selectedRow);
-            FileUtil.save("drivers.dat", drivers);
+            fileUtil.save("drivers.dat", drivers);
             model.removeRow(selectedRow);
             selectedRow = -1;
             clearForm();
@@ -318,10 +354,11 @@ public class DriverPanel extends JPanel
         nameField.requestFocus();
         selectedRow = -1;
     }
+    
     private void loadDriversToTable() 
     {
         model.setRowCount(0);
-        drivers = FileUtil.load("drivers.dat");
+        drivers = fileUtil.load("drivers.dat");
         for (Driver driver : drivers) 
         {
             model.addRow(new Object[]

@@ -4,12 +4,14 @@ import javax.swing.*;
 import javax.swing.table.*;
 public class RoomListPanel extends JPanel 
 {
+    private FileUtil fileUtil; 
 
     public RoomListPanel() 
     {
         setLayout(new BorderLayout());
         setBackground(UITheme.CARD_BG);
-        ArrayList<HotelRoom> rooms = FileUtil.load("rooms.dat");
+        fileUtil = FileUtil.getInstance();
+        ArrayList<HotelRoom> rooms = fileUtil.load("rooms.dat");
         String[] columns = {"Room No", "Category", "Price", "Available", "Cleaned"};
         DefaultTableModel model = new DefaultTableModel(columns, 0);
         for (HotelRoom r : rooms) 
@@ -28,7 +30,7 @@ public class RoomListPanel extends JPanel
         table.setForeground(UITheme.TEXT_COLOR);
         table.setGridColor(new Color(70, 70, 70));
         table.setRowHeight(35);
-        table.setFont(UITheme.SMALL_FONT);
+        table.setFont(UITheme.SMALL_FONT);       
         JTableHeader header = table.getTableHeader();
         header.setBackground(UITheme.SECONDARY_COLOR);
         header.setForeground(Color.WHITE);

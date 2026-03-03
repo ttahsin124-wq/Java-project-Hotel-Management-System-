@@ -2,10 +2,8 @@ import java.awt.*;
 import java.util.ArrayList;
 import javax.swing.*;
 import javax.swing.table.*;
-
 public class RoomPanel extends JPanel 
 {
-
     private DefaultTableModel model;
     private ArrayList<HotelRoom> rooms;
     private JTextField roomNoField, priceField;
@@ -13,12 +11,13 @@ public class RoomPanel extends JPanel
     private JCheckBox availableCheck, cleanedCheck;
     private JButton addButton, editButton, deleteButton, clearButton;
     private int selectedRow = -1;
-
+    private FileUtil fileUtil;  
     public RoomPanel() 
     {
         setLayout(new BorderLayout());
         setBackground(UITheme.CARD_BG);
-        rooms = FileUtil.load("rooms.dat");
+        fileUtil = FileUtil.getInstance();
+        rooms = fileUtil.load("rooms.dat");
         JPanel headerPanel = new JPanel(new BorderLayout());
         headerPanel.setBackground(UITheme.DARK_BG);
         headerPanel.setBorder(BorderFactory.createEmptyBorder(15, 20, 15, 20));
@@ -35,13 +34,20 @@ public class RoomPanel extends JPanel
         add(headerPanel, BorderLayout.NORTH);
         add(splitPane, BorderLayout.CENTER);
     }
+    
     private JPanel createFormPanel() 
     {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         panel.setBackground(UITheme.CARD_BG);
-        panel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(UITheme.PRIMARY_COLOR, 2),"Room Form",0, 0, UITheme.HEADER_FONT, UITheme.TEXT_COLOR));
-        panel.setBorder(BorderFactory.createCompoundBorder(panel.getBorder(),BorderFactory.createEmptyBorder(20, 20, 20, 20)));
+        panel.setBorder(BorderFactory.createTitledBorder(
+            BorderFactory.createLineBorder(UITheme.PRIMARY_COLOR, 2),
+            "Room Form",
+            0, 0, UITheme.HEADER_FONT, UITheme.TEXT_COLOR));
+        panel.setBorder(BorderFactory.createCompoundBorder(
+            panel.getBorder(),
+            BorderFactory.createEmptyBorder(20, 20, 20, 20)));
+        
         roomNoField = UITheme.createStyledTextField();
         priceField = UITheme.createStyledTextField();
         categoryCombo = UITheme.createStyledComboBox(new String[]{"SINGLE", "DOUBLE", "DELUXE", "SUITE"});
@@ -79,7 +85,7 @@ public class RoomPanel extends JPanel
     private JPanel createFormRow(String label, Component field) 
     {
         JPanel rowPanel = new JPanel(new BorderLayout(15, 0));
-        rowPanel.setBackground(UITheme.CARD_BG);
+        rowPanel.setBackground(UITheme.CARD_BG);  
         JLabel lbl = new JLabel(label);
         lbl.setForeground(UITheme.TEXT_COLOR);
         lbl.setFont(UITheme.NORMAL_FONT);
@@ -89,6 +95,7 @@ public class RoomPanel extends JPanel
         rowPanel.add(field, BorderLayout.CENTER);
         return rowPanel;
     }
+    
     private JPanel createCheckBoxRow(String label, JCheckBox... checkBoxes) 
     {
         JPanel rowPanel = new JPanel(new BorderLayout(15, 0));
@@ -157,7 +164,11 @@ public class RoomPanel extends JPanel
         header.setForeground(Color.WHITE);
         header.setFont(UITheme.NORMAL_FONT);
         JScrollPane scrollPane = new JScrollPane(table);
-        scrollPane.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(UITheme.SECONDARY_COLOR, 2),"Room List (" + rooms.size() + ")",0, 0, UITheme.HEADER_FONT, UITheme.TEXT_COLOR));
+        scrollPane.setBorder(BorderFactory.createTitledBorder(
+            BorderFactory.createLineBorder(UITheme.SECONDARY_COLOR, 2),
+            "Room List (" + rooms.size() + ")",
+            0, 0, UITheme.HEADER_FONT, UITheme.TEXT_COLOR));
+        
         return scrollPane;
     }
     private void addRoom() 
@@ -169,23 +180,29 @@ public class RoomPanel extends JPanel
             double price = Double.parseDouble(priceField.getText().trim());
             boolean available = availableCheck.isSelected();
             boolean cleaned = cleanedCheck.isSelected();
+            
             for (HotelRoom r : rooms) 
             {
                 if (r.roomNo == roomNo) 
                 {
-                    JOptionPane.showMessageDialog(this,"Room number " + roomNo + " already exists!","Duplicate Room",JOptionPane.WARNING_MESSAGE);
+                    JOptionPane.showMessageDialog(this,
+                        "Room number " + roomNo + " already exists!",
+                        "Duplicate Room",
+                        JOptionPane.WARNING_MESSAGE);
                     return;
                 }
             }
             RoomCategory cat = RoomCategory.valueOf(category);
             HotelRoom room = new HotelRoom(roomNo, cat, price, available, cleaned);
             rooms.add(room);
-            FileUtil.save("rooms.dat", rooms);
+            
+            fileUtil.save("rooms.dat", rooms);
+            
             model.addRow(new Object[]{
                 room.roomNo,
                 room.category,
                 String.format("$%.2f", room.price),
-                room.available ? "Yes" : "NO",
+                room.available ? "Yes" : "No",
                 room.cleaned ? "Yes" : "No"
             });
             clearForm();
@@ -219,7 +236,7 @@ public class RoomPanel extends JPanel
             room.price = price;
             room.available = available;
             room.cleaned = cleaned;
-            FileUtil.save("rooms.dat", rooms);
+            fileUtil.save("rooms.dat", rooms);
             model.setValueAt(room.roomNo, selectedRow, 0);
             model.setValueAt(room.category, selectedRow, 1);
             model.setValueAt(String.format("$%.2f", room.price), selectedRow, 2);
@@ -246,18 +263,24 @@ public class RoomPanel extends JPanel
             return;
         }
         
-        int confirm = JOptionPane.showConfirmDialog(this,"Are you sure you want to delete this room?\nThis action cannot be undone.","Confirm Deletion",JOptionPane.YES_NO_OPTION,JOptionPane.WARNING_MESSAGE);
+        int confirm = JOptionPane.showConfirmDialog(this,
+            "Are you sure you want to delete this room?\nThis action cannot be undone.",
+            "Confirm Deletion",
+            JOptionPane.YES_NO_OPTION,
+            JOptionPane.WARNING_MESSAGE);
+            
         if (confirm == JOptionPane.YES_OPTION) 
         {
             HotelRoom deletedRoom = rooms.remove(selectedRow);
-            FileUtil.save("rooms.dat", rooms);
+            fileUtil.save("rooms.dat", rooms);
             model.removeRow(selectedRow);
             selectedRow = -1;
             clearForm();
             editButton.setEnabled(false);
             deleteButton.setEnabled(false);
             addButton.setEnabled(true);
-            JOptionPane.showMessageDialog(this, "Room " + deletedRoom.roomNo + " deleted successfully!");
+            JOptionPane.showMessageDialog(this, 
+                "Room " + deletedRoom.roomNo + " deleted successfully!");
         }
     }
 
@@ -288,7 +311,8 @@ public class RoomPanel extends JPanel
     private void loadRoomsToTable() 
     {
         model.setRowCount(0);
-        rooms = FileUtil.load("rooms.dat");
+        rooms = fileUtil.load("rooms.dat");
+        
         for (HotelRoom room : rooms) 
         {
             model.addRow(new Object[]{

@@ -7,11 +7,13 @@ public class UpdateRoomStatusPanel extends JPanel
 {
     private ArrayList<HotelRoom> rooms;
     private final DefaultTableModel model;
+    private FileUtil fileUtil; 
     public UpdateRoomStatusPanel() 
     {
         setLayout(new BorderLayout());
         setBackground(UITheme.CARD_BG);
-        rooms = FileUtil.load("rooms.dat");
+        fileUtil = FileUtil.getInstance();
+        rooms = fileUtil.load("rooms.dat");
         JPanel headerPanel = new JPanel(new BorderLayout());
         headerPanel.setBackground(UITheme.WARNING_COLOR);
         headerPanel.setBorder(BorderFactory.createEmptyBorder(15, 20, 15, 20));
@@ -43,7 +45,7 @@ public class UpdateRoomStatusPanel extends JPanel
             {
                 HotelRoom r = rooms.get(row);
                 r.available = !r.available;
-                FileUtil.save("rooms.dat", rooms);
+                fileUtil.save("rooms.dat", rooms);
                 loadTable();
                 JOptionPane.showMessageDialog(this, "Room " + r.roomNo + " availability updated!");
             } 
@@ -52,13 +54,14 @@ public class UpdateRoomStatusPanel extends JPanel
                 JOptionPane.showMessageDialog(this, "Please select a room first!");
             }
         });
+        
         btnToggleCleaned.addActionListener(e -> {
             int row = table.getSelectedRow();
             if (row >= 0) 
             {
                 HotelRoom r = rooms.get(row);
                 r.cleaned = !r.cleaned;
-                FileUtil.save("rooms.dat", rooms);
+                fileUtil.save("rooms.dat", rooms);
                 loadTable();
                 JOptionPane.showMessageDialog(this, "Room " + r.roomNo + " cleaning status updated!");
             } 
@@ -75,10 +78,12 @@ public class UpdateRoomStatusPanel extends JPanel
         add(new JScrollPane(table), BorderLayout.CENTER);
         add(bottomPanel, BorderLayout.SOUTH);
     }
+    
     private void loadTable() 
     {
         model.setRowCount(0);
-        rooms = FileUtil.load("rooms.dat");
+        rooms = fileUtil.load("rooms.dat");
+        
         for (HotelRoom r : rooms) {
             model.addRow(new Object[]{
                 r.roomNo,

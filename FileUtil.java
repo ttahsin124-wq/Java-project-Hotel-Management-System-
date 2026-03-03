@@ -1,12 +1,21 @@
 import java.io.*;
 import java.util.ArrayList;
 
-
 public class FileUtil 
 {
-
-    public static <T> void save(String file, ArrayList<T> list) 
+    private static FileUtil instance;
+    private FileUtil() 
     {
+       
+    }
+    public static synchronized FileUtil getInstance()
+    {
+        if (instance == null) {
+            instance = new FileUtil();
+        }
+        return instance;
+    }
+    public <T> void save(String file, ArrayList<T> list) {
         try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(file))) 
         {
             oos.writeObject(list);
@@ -25,11 +34,12 @@ public class FileUtil
             }
         }
     }
+    
     @SuppressWarnings("unchecked")
-    public static <T> ArrayList<T> load(String file) 
+    public <T> ArrayList<T> load(String file)
     {
         File dataFile = new File(file);
-        if (!dataFile.exists()) 
+        if (!dataFile.exists())
         {
             return new ArrayList<>();
         }
@@ -37,11 +47,11 @@ public class FileUtil
         {
             return new ArrayList<>();
         }
-        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file))) 
+        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file)))
         {
             return (ArrayList<T>) ois.readObject();
-        } 
-        catch (EOFException e) 
+        }
+        catch (EOFException e)
         {
             return new ArrayList<>();
         } 
@@ -50,5 +60,9 @@ public class FileUtil
             System.err.println("Error loading from " + file + ": " + e.getMessage());
             return new ArrayList<>();
         }
+    }
+    public static void resetInstance() 
+    {
+        instance = null;
     }
 }

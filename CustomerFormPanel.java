@@ -6,7 +6,6 @@ import javax.swing.table.*;
 
 public class CustomerFormPanel extends JPanel 
 {
-
     private ArrayList<Customer> customers;
     private DefaultTableModel model;
     private JTextField txtId, txtName, txtPhone, txtEmail, txtRoomNumber;
@@ -14,12 +13,14 @@ public class CustomerFormPanel extends JPanel
     private JButton addButton, editButton, deleteButton, clearButton;
     private JTable table;
     private int selectedRow = -1;
+    private FileUtil fileUtil; 
 
     public CustomerFormPanel() 
     {
         setLayout(new BorderLayout());
         setBackground(UITheme.CARD_BG);
-        customers = FileUtil.load("customers.dat");
+        fileUtil = FileUtil.getInstance();
+        customers = fileUtil.load("customers.dat");
         JPanel headerPanel = new JPanel(new BorderLayout());
         headerPanel.setBackground(UITheme.DARK_BG);
         headerPanel.setBorder(BorderFactory.createEmptyBorder(15, 20, 15, 20));
@@ -35,7 +36,6 @@ public class CustomerFormPanel extends JPanel
         splitPane.setRightComponent(createTablePanel());
         add(headerPanel, BorderLayout.NORTH);
         add(splitPane, BorderLayout.CENTER);
-    
     }
 
     private JPanel createFormPanel() 
@@ -52,6 +52,7 @@ public class CustomerFormPanel extends JPanel
             panel.getBorder(),
             BorderFactory.createEmptyBorder(20, 20, 20, 20)
         ));
+        
         txtId = UITheme.createStyledTextField();
         txtName = UITheme.createStyledTextField();
         txtPhone = UITheme.createStyledTextField();
@@ -102,7 +103,7 @@ public class CustomerFormPanel extends JPanel
         JLabel lbl = new JLabel(label);
         lbl.setForeground(UITheme.TEXT_COLOR);
         lbl.setFont(UITheme.NORMAL_FONT);
-        lbl.setPreferredSize(new Dimension(150, 30));
+        lbl.setPreferredSize(new Dimension(150, 30)); 
         field.setPreferredSize(new Dimension(200, 35));
         rowPanel.add(lbl, BorderLayout.WEST);
         rowPanel.add(field, BorderLayout.CENTER);
@@ -114,6 +115,7 @@ public class CustomerFormPanel extends JPanel
         spinner.setBackground(UITheme.CARD_BG);
         spinner.setForeground(UITheme.TEXT_COLOR);
         spinner.setFont(UITheme.NORMAL_FONT);
+        
         JFormattedTextField tf = ((JSpinner.DefaultEditor) spinner.getEditor()).getTextField();
         tf.setBackground(UITheme.CARD_BG);
         tf.setForeground(UITheme.TEXT_COLOR);
@@ -138,6 +140,7 @@ public class CustomerFormPanel extends JPanel
 
         table = new JTable(model);
         loadCustomersToTable();
+        
         table.getSelectionModel().addListSelectionListener(e -> {
             if (!e.getValueIsAdjusting()) 
             {
@@ -159,7 +162,6 @@ public class CustomerFormPanel extends JPanel
             }
         });
         
-        
         table.setBackground(UITheme.CARD_BG);
         table.setForeground(UITheme.TEXT_COLOR);
         table.setGridColor(new Color(70, 70, 70));
@@ -167,6 +169,7 @@ public class CustomerFormPanel extends JPanel
         table.setFont(UITheme.SMALL_FONT);
         table.setSelectionBackground(UITheme.SUCCESS_COLOR);
         table.setSelectionForeground(Color.WHITE);
+        
         table.getColumnModel().getColumn(0).setPreferredWidth(60);  
         table.getColumnModel().getColumn(1).setPreferredWidth(150); 
         table.getColumnModel().getColumn(2).setPreferredWidth(100); 
@@ -174,16 +177,19 @@ public class CustomerFormPanel extends JPanel
         table.getColumnModel().getColumn(4).setPreferredWidth(70);  
         table.getColumnModel().getColumn(5).setPreferredWidth(120); 
         table.getColumnModel().getColumn(6).setPreferredWidth(120);
+        
         JTableHeader header = table.getTableHeader();
         header.setBackground(UITheme.SECONDARY_COLOR);
         header.setForeground(Color.WHITE);
         header.setFont(UITheme.NORMAL_FONT);
+        
         JScrollPane scrollPane = new JScrollPane(table);
         scrollPane.setBorder(BorderFactory.createTitledBorder(
             BorderFactory.createLineBorder(UITheme.SECONDARY_COLOR, 2),
             "Customer List (" + customers.size() + ")",
             0, 0, UITheme.HEADER_FONT, UITheme.TEXT_COLOR
         ));
+        
         return scrollPane;
     }
 
@@ -191,7 +197,6 @@ public class CustomerFormPanel extends JPanel
     {
         try 
         {
-           
             if (txtName.getText().trim().isEmpty()) 
             {
                 JOptionPane.showMessageDialog(this, "Please enter customer name!","Validation Error", JOptionPane.WARNING_MESSAGE);
@@ -203,15 +208,17 @@ public class CustomerFormPanel extends JPanel
                 JOptionPane.showMessageDialog(this, "Please enter phone number!", "Validation Error", JOptionPane.WARNING_MESSAGE);
                 return;
             }
+            
             int id = Integer.parseInt(txtId.getText().trim());
             String name = txtName.getText().trim();
             String phone = txtPhone.getText().trim();
             String email = txtEmail.getText().trim();
             Date checkIn = (Date) checkInSpinner.getValue();
             Date checkOut = (Date) checkOutSpinner.getValue();
+            
             Integer roomNumber = null;
             if (!txtRoomNumber.getText().trim().isEmpty()) 
-                {
+            {
                 try 
                 {
                     roomNumber = Integer.parseInt(txtRoomNumber.getText().trim());
@@ -222,11 +229,13 @@ public class CustomerFormPanel extends JPanel
                     return;
                 }
             }
+            
             if (checkOut.before(checkIn)) 
             {
                 JOptionPane.showMessageDialog(this, "Check-out date must be after check-in date!", "Validation Error", JOptionPane.WARNING_MESSAGE);
                 return;
             }
+            
             for (Customer c : customers) 
             {
                 if (c.getId() == id) 
@@ -235,9 +244,10 @@ public class CustomerFormPanel extends JPanel
                     return;
                 }
             }
+            
             Customer customer = new Customer(id, name, phone, email, checkIn, checkOut, roomNumber);
             customers.add(customer);
-            FileUtil.save("customers.dat", customers);
+            fileUtil.save("customers.dat", customers);
             model.addRow(new Object[]{
                 customer.getId(),
                 customer.getName(),
@@ -247,6 +257,7 @@ public class CustomerFormPanel extends JPanel
                 customer.getCheckIn(),
                 customer.getCheckOut()
             });
+            
             clearForm();
             JOptionPane.showMessageDialog(this, "Customer added successfully!\nID: " + id + "\nName: " + name, "Success", JOptionPane.INFORMATION_MESSAGE);
             
@@ -268,9 +279,9 @@ public class CustomerFormPanel extends JPanel
             JOptionPane.showMessageDialog(this, "Please select a customer to edit!");
             return;
         }
+        
         try 
         {
-            
             if (txtName.getText().trim().isEmpty()) 
             {
                 JOptionPane.showMessageDialog(this, "Please enter customer name!");
@@ -289,6 +300,7 @@ public class CustomerFormPanel extends JPanel
             String email = txtEmail.getText().trim();
             Date checkIn = (Date) checkInSpinner.getValue();
             Date checkOut = (Date) checkOutSpinner.getValue();
+            
             Integer roomNumber = null;
             if (!txtRoomNumber.getText().trim().isEmpty()) 
             {
@@ -302,11 +314,13 @@ public class CustomerFormPanel extends JPanel
                     return;
                 }
             }
+            
             if (checkOut.before(checkIn)) 
             {
                 JOptionPane.showMessageDialog(this, "Check-out date must be after check-in date!");
                 return;
             }
+            
             Customer customer = customers.get(selectedRow);
             customer.setId(id);
             customer.setName(name);
@@ -315,7 +329,7 @@ public class CustomerFormPanel extends JPanel
             customer.setCheckIn(checkIn);
             customer.setCheckOut(checkOut);
             customer.setRoomNumber(roomNumber);
-            FileUtil.save("customers.dat", customers);
+            fileUtil.save("customers.dat", customers);
             model.setValueAt(customer.getId(), selectedRow, 0);
             model.setValueAt(customer.getName(), selectedRow, 1);
             model.setValueAt(customer.getPhone(), selectedRow, 2);
@@ -323,10 +337,12 @@ public class CustomerFormPanel extends JPanel
             model.setValueAt(customer.getRoomNumber() != null ? customer.getRoomNumber() : "Not assigned", selectedRow, 4);
             model.setValueAt(customer.getCheckIn(), selectedRow, 5);
             model.setValueAt(customer.getCheckOut(), selectedRow, 6);
+            
             clearForm();
             editButton.setEnabled(false);
             deleteButton.setEnabled(false);
             addButton.setEnabled(true);
+            
             JOptionPane.showMessageDialog(this, "Customer updated successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
             
         } 
@@ -348,11 +364,16 @@ public class CustomerFormPanel extends JPanel
             return;
         }
         
-        int confirm = JOptionPane.showConfirmDialog(this,"Are you sure you want to delete this customer?\nThis action cannot be undone.","Confirm Deletion",JOptionPane.YES_NO_OPTION,JOptionPane.WARNING_MESSAGE);
+        int confirm = JOptionPane.showConfirmDialog(this,
+            "Are you sure you want to delete this customer?\nThis action cannot be undone.",
+            "Confirm Deletion",
+            JOptionPane.YES_NO_OPTION,
+            JOptionPane.WARNING_MESSAGE);
+            
         if (confirm == JOptionPane.YES_OPTION) 
         {
             Customer deletedCustomer = customers.remove(selectedRow);
-            FileUtil.save("customers.dat", customers);
+            fileUtil.save("customers.dat", customers);  
             model.removeRow(selectedRow);
             selectedRow = -1;
             clearForm();
@@ -372,6 +393,7 @@ public class CustomerFormPanel extends JPanel
             txtName.setText(customer.getName());
             txtPhone.setText(customer.getPhone());
             txtEmail.setText(customer.getEmail());
+            
             if (customer.getRoomNumber() != null) 
             {
                 txtRoomNumber.setText(String.valueOf(customer.getRoomNumber()));
@@ -402,7 +424,7 @@ public class CustomerFormPanel extends JPanel
     private void loadCustomersToTable() 
     {
         model.setRowCount(0);
-        customers = FileUtil.load("customers.dat");
+        customers = fileUtil.load("customers.dat");
         
         for (Customer customer : customers) 
         {

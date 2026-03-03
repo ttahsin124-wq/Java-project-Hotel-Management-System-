@@ -6,10 +6,10 @@ import java.util.ArrayList;
 
 public class ReceptionDashboard extends JFrame 
 {
-    
-    private  JPanel mainContentPanel;
+    private JPanel mainContentPanel;
     private CardLayout cardLayout;
     private JLabel welcomeLabel;
+    private FileUtil fileUtil;
     public ReceptionDashboard() 
     {
         UITheme.apply();
@@ -18,6 +18,7 @@ public class ReceptionDashboard extends JFrame
         setLocationRelativeTo(null);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
+        fileUtil = FileUtil.getInstance();
         JPanel mainPanel = new JPanel(new BorderLayout());
         mainPanel.setBackground(UITheme.DARK_BG);
         JPanel headerPanel = createHeader();
@@ -42,18 +43,20 @@ public class ReceptionDashboard extends JFrame
         title.setForeground(Color.WHITE);
         welcomeLabel = new JLabel("Welcome, Receptionist!");
         welcomeLabel.setFont(UITheme.NORMAL_FONT);
-        welcomeLabel.setForeground(Color.WHITE);
+        welcomeLabel.setForeground(Color.WHITE); 
         JButton logoutBtn = createStyledButton("Logout", UITheme.DANGER_COLOR);
         logoutBtn.addActionListener(e -> 
-            {
-            int confirm = JOptionPane.showConfirmDialog(this,"Are you sure you want to logout?","Confirm Logout",JOptionPane.YES_NO_OPTION);
+        {
+            int confirm = JOptionPane.showConfirmDialog(this,
+                "Are you sure you want to logout?",
+                "Confirm Logout",
+                JOptionPane.YES_NO_OPTION);
             if (confirm == JOptionPane.YES_OPTION) 
             {
                 dispose();
                 new LoginFrame().setVisible(true);
             }
         });
-        
         JPanel leftPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         leftPanel.setOpaque(false);
         leftPanel.add(title);
@@ -63,6 +66,7 @@ public class ReceptionDashboard extends JFrame
         header.add(logoutBtn, BorderLayout.EAST);
         return header;
     }
+    
     private JPanel createSidebar() 
     {
         JPanel sidebar = new JPanel();
@@ -76,7 +80,7 @@ public class ReceptionDashboard extends JFrame
         quickActions.setAlignmentX(Component.LEFT_ALIGNMENT);
         quickActions.setBorder(BorderFactory.createEmptyBorder(0, 0, 10, 0));
         sidebar.add(quickActions);
-        sidebar.add(Box.createRigidArea(new Dimension(0, 10)));
+        sidebar.add(Box.createRigidArea(new Dimension(0, 10))); 
         String[] buttons = {
             "New Customer Registration",
             "Make Reservation",
@@ -92,9 +96,10 @@ public class ReceptionDashboard extends JFrame
             "Settings"
         };
         String[] cardNames = {
-            "newCustomer", "makeReservation", "checkIn", "checkOut", "searchCustomer", "viewReservations", "roomStatus", "pickup", "updateRoom", "allCustomers", "reports", "settings"
+            "newCustomer", "makeReservation", "checkIn", "checkOut", 
+            "searchCustomer", "viewReservations", "roomStatus", "pickup", 
+            "updateRoom", "allCustomers", "reports", "settings"
         };
-        
         for (int i = 0; i < buttons.length; i++) 
         {
             JButton btn = createSidebarButton(buttons[i], cardNames[i]);
@@ -168,7 +173,6 @@ public class ReceptionDashboard extends JFrame
     }
     private void highlightActiveButton(JButton activeButton) 
     {
-        
         for (Component comp : ((JPanel)activeButton.getParent()).getComponents()) 
         {
             if (comp instanceof JButton) 
@@ -213,10 +217,12 @@ public class ReceptionDashboard extends JFrame
     {
         private JTextField txtSearch;
         private JComboBox<String> searchTypeCombo;
+        private FileUtil fileUtil;
         public SearchCustomerPanel() 
         {
             setLayout(new BorderLayout());
             setBackground(UITheme.CARD_BG);
+            fileUtil = FileUtil.getInstance();
             JPanel headerPanel = new JPanel(new BorderLayout());
             headerPanel.setBackground(UITheme.DARK_BG);
             headerPanel.setBorder(BorderFactory.createEmptyBorder(15, 20, 15, 20));
@@ -255,7 +261,7 @@ public class ReceptionDashboard extends JFrame
                     resultsArea.setText("Please enter search text!");
                     return;
                 }
-                ArrayList<Customer> customers = FileUtil.load("customers.dat");
+                ArrayList<Customer> customers = fileUtil.load("customers.dat");
                 StringBuilder results = new StringBuilder();
                 results.append("Search Results for '").append(searchText).append("' (").append(searchType).append("):\n");
                 results.append("=".repeat(50)).append("\n\n");
@@ -281,7 +287,6 @@ public class ReceptionDashboard extends JFrame
                             }
                             break;
                     }
-                    
                     if (match) 
                     {
                         found++;
@@ -295,7 +300,6 @@ public class ReceptionDashboard extends JFrame
                         results.append("-".repeat(50)).append("\n");
                     }
                 }
-                
                 if (found == 0) 
                 {
                     results.append("No customers found.\n");
@@ -321,10 +325,12 @@ public class ReceptionDashboard extends JFrame
     class ViewReservationsPanel extends JPanel 
     {
         private final JTextArea reservationsArea;
+        private FileUtil fileUtil; 
         public ViewReservationsPanel() 
         {
             setLayout(new BorderLayout());
             setBackground(UITheme.CARD_BG);
+            fileUtil = FileUtil.getInstance();
             JPanel headerPanel = new JPanel(new BorderLayout());
             headerPanel.setBackground(UITheme.DARK_BG);
             headerPanel.setBorder(BorderFactory.createEmptyBorder(15, 20, 15, 20));
@@ -347,7 +353,7 @@ public class ReceptionDashboard extends JFrame
         }
         private void loadReservations() 
         {
-            ArrayList<Reservation> reservations = FileUtil.load("reservations.dat");
+            ArrayList<Reservation> reservations = fileUtil.load("reservations.dat");
             StringBuilder sb = new StringBuilder();
             sb.append("TOTAL RESERVATIONS: ").append(reservations.size()).append("\n");
             sb.append("=".repeat(80)).append("\n\n");
@@ -370,6 +376,7 @@ public class ReceptionDashboard extends JFrame
                     sb.append("-".repeat(80)).append("\n");
                 }
             }
+            
             reservationsArea.setText(sb.toString());
         }
     }
@@ -401,7 +408,7 @@ public class ReceptionDashboard extends JFrame
         gbc.gridx = 0; gbc.gridy = 0;
         formPanel.add(createFormLabel("Reservation ID:"), gbc);
         gbc.gridx = 1;
-        formPanel.add(reservationIdField, gbc);
+        formPanel.add(reservationIdField, gbc); 
         gbc.gridx = 0; gbc.gridy = 1;
         formPanel.add(createFormLabel("Customer Name:"), gbc);
         gbc.gridx = 1;
@@ -420,10 +427,11 @@ public class ReceptionDashboard extends JFrame
                 JOptionPane.showMessageDialog(panel, "Please enter reservation ID!");
                 return;
             }
+            
             try 
             {
                 int reservationId = Integer.parseInt(resId);
-                ArrayList<Reservation> reservations = FileUtil.load("reservations.dat");
+                ArrayList<Reservation> reservations = fileUtil.load("reservations.dat");
                 boolean found = false;
                 for (Reservation res : reservations) 
                 {
@@ -432,6 +440,7 @@ public class ReceptionDashboard extends JFrame
                         found = true;
                         customerNameField.setText(res.getCustomer().getName());
                         roomField.setText(String.valueOf(res.getRoom().roomNo));
+                        
                         if (res.getStatus().equals("CHECKED_IN")) 
                         {
                             JOptionPane.showMessageDialog(panel, "This guest is already checked in!");
@@ -464,7 +473,7 @@ public class ReceptionDashboard extends JFrame
             try 
             {
                 int reservationId = Integer.parseInt(resId);
-                ArrayList<Reservation> reservations = FileUtil.load("reservations.dat");
+                ArrayList<Reservation> reservations = fileUtil.load("reservations.dat");
                 boolean updated = false;
                 for (Reservation res : reservations) 
                 {
@@ -473,20 +482,27 @@ public class ReceptionDashboard extends JFrame
                         if (res.getStatus().equals("CONFIRMED")) 
                         {
                             res.setStatus("CHECKED_IN");
-                            FileUtil.save("reservations.dat", reservations);
+                            fileUtil.save("reservations.dat", reservations);
+                            
                             updated = true;
-                            JOptionPane.showMessageDialog(panel, "Guest checked in successfully!\n" +"Customer: " + res.getCustomer().getName() + "\n" +"Room: " + res.getRoom().roomNo);
+                            JOptionPane.showMessageDialog(panel, 
+                                "Guest checked in successfully!\n" +
+                                "Customer: " + res.getCustomer().getName() + "\n" +
+                                "Room: " + res.getRoom().roomNo);
+                            
                             reservationIdField.setText("");
                             customerNameField.setText("");
                             roomField.setText("");
                         } 
                         else 
                         {
-                            JOptionPane.showMessageDialog(panel, "Cannot check-in. Reservation status is: " + res.getStatus());
+                            JOptionPane.showMessageDialog(panel, 
+                                "Cannot check-in. Reservation status is: " + res.getStatus());
                         }
                         break;
                     }
                 }
+                
                 if (!updated) 
                 {
                     JOptionPane.showMessageDialog(panel, "Check-in failed!");
@@ -498,9 +514,12 @@ public class ReceptionDashboard extends JFrame
                 JOptionPane.showMessageDialog(panel, "Error: " + ex.getMessage());
             }
         });
+        
         formPanel.add(checkInBtn, gbc);
+        
         panel.add(title, BorderLayout.NORTH);
         panel.add(formPanel, BorderLayout.CENTER);
+        
         return panel;
     }
     
@@ -515,9 +534,9 @@ public class ReceptionDashboard extends JFrame
         JPanel statsPanel = new JPanel(new GridLayout(1, 4, 15, 15));
         statsPanel.setBackground(UITheme.CARD_BG);
         statsPanel.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0));
-        ArrayList<Customer> customers = FileUtil.load("customers.dat");
-        ArrayList<Reservation> reservations = FileUtil.load("reservations.dat");
-        ArrayList<HotelRoom> rooms = FileUtil.load("rooms.dat");
+        ArrayList<Customer> customers = fileUtil.load("customers.dat");
+        ArrayList<Reservation> reservations = fileUtil.load("reservations.dat");
+        ArrayList<HotelRoom> rooms = fileUtil.load("rooms.dat");
         int checkedInCount = 0;
         for (Reservation res : reservations) 
         {
@@ -526,6 +545,7 @@ public class ReceptionDashboard extends JFrame
                 checkedInCount++;
             }
         }
+        
         int availableRooms = 0;
         for (HotelRoom room : rooms) 
         {
@@ -534,6 +554,7 @@ public class ReceptionDashboard extends JFrame
                 availableRooms++;
             }
         }
+
         int pendingCheckouts = 0;
         for (Reservation res : reservations) 
         {
@@ -542,12 +563,11 @@ public class ReceptionDashboard extends JFrame
                 pendingCheckouts++;
             }
         }
-        int occupancyRate = rooms.size() > 0 ?  ((rooms.size() - availableRooms) * 100) / rooms.size() : 0;
-        
+        int occupancyRate = rooms.size() > 0 ? ((rooms.size() - availableRooms) * 100) / rooms.size() : 0;
         statsPanel.add(createMiniStatCard("Checked-in", String.valueOf(checkedInCount), UITheme.SUCCESS_COLOR));
         statsPanel.add(createMiniStatCard("Available Rooms", String.valueOf(availableRooms), UITheme.PRIMARY_COLOR));
         statsPanel.add(createMiniStatCard("Pending Check-outs", String.valueOf(pendingCheckouts), UITheme.WARNING_COLOR));
-        statsPanel.add(createMiniStatCard("Occupancy", occupancyRate + "%", new Color(155, 89, 182)));
+        statsPanel.add(createMiniStatCard("Occupancy", occupancyRate + "%", new Color(155, 89, 182))); 
         JTextArea summaryArea = new JTextArea(10, 50);
         summaryArea.setBackground(UITheme.CARD_BG);
         summaryArea.setForeground(UITheme.TEXT_COLOR);
@@ -593,7 +613,11 @@ public class ReceptionDashboard extends JFrame
         gbc.gridx = 0; gbc.gridy = 1;
         settingsForm.add(createFormLabel("Shift Timing:"), gbc);
         gbc.gridx = 1;
-        JComboBox<String> shiftCombo = new JComboBox<>(new String[]{"Morning (8AM-4PM)", "Evening (4PM-12AM)", "Night (12AM-8AM)"});
+        JComboBox<String> shiftCombo = new JComboBox<>(new String[]{
+            "Morning (8AM-4PM)", 
+            "Evening (4PM-12AM)", 
+            "Night (12AM-8AM)"
+        });
         shiftCombo.setBackground(UITheme.CARD_BG);
         shiftCombo.setForeground(UITheme.TEXT_COLOR);
         settingsForm.add(shiftCombo, gbc);
@@ -605,14 +629,14 @@ public class ReceptionDashboard extends JFrame
         soundCheck.setForeground(UITheme.TEXT_COLOR);
         settingsForm.add(soundCheck, gbc);
         gbc.gridx = 0; gbc.gridy = 3;
-        gbc.gridwidth = 2;
+        gbc.gridwidth = 2; 
         JButton saveBtn = createStyledButton("Save Preferences", UITheme.SUCCESS_COLOR);
         saveBtn.addActionListener(e -> {
             JOptionPane.showMessageDialog(panel, "Settings saved successfully!");
         });
         settingsForm.add(saveBtn, gbc);
         panel.add(title, BorderLayout.NORTH);
-        panel.add(settingsForm, BorderLayout.CENTER);
+        panel.add(settingsForm, BorderLayout.CENTER);    
         return panel;
     }
     

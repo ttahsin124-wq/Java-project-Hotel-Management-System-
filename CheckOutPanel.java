@@ -5,28 +5,24 @@ import javax.swing.table.*;
 
 public class CheckOutPanel extends JPanel 
 {
-
     private JTable table;
     private DefaultTableModel model;
     private ArrayList<Customer> customers;
+    private FileUtil fileUtil;  
 
     public CheckOutPanel() 
     {
         setLayout(new BorderLayout());
         setBackground(UITheme.CARD_BG);
-
-        customers = FileUtil.load("customers.dat");
+        fileUtil = FileUtil.getInstance();
+        customers = fileUtil.load("customers.dat");
         JPanel headerPanel = new JPanel(new BorderLayout());
         headerPanel.setBackground(UITheme.DANGER_COLOR);
         headerPanel.setBorder(BorderFactory.createEmptyBorder(15, 20, 15, 20));
-        
         JLabel title = new JLabel("Guest Check-Out");
         title.setFont(UITheme.HEADER_FONT);
         title.setForeground(Color.WHITE);
-        
         headerPanel.add(title, BorderLayout.WEST);
-
-        
         String[] columns = {"ID", "Name", "Phone", "Email", "Check-In", "Check-Out"};
         model = new DefaultTableModel(columns, 0);
         table = new JTable(model);
@@ -42,22 +38,17 @@ public class CheckOutPanel extends JPanel
         header.setBackground(UITheme.SECONDARY_COLOR);
         header.setForeground(Color.WHITE);
         header.setFont(UITheme.NORMAL_FONT);
-        
         JScrollPane scroll = new JScrollPane(table);
         scroll.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         JPanel btnPanel = new JPanel();
         btnPanel.setBackground(UITheme.CARD_BG);
         btnPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        
         JButton btnCheckOut = UITheme.createStyledButton("Check Out Selected Guest", UITheme.DANGER_COLOR);
         JButton btnRefresh = UITheme.createStyledButton("Refresh List", UITheme.WARNING_COLOR);
-        
         btnCheckOut.addActionListener(e -> checkOutCustomer());
         btnRefresh.addActionListener(e -> loadTable());
-        
         btnPanel.add(btnCheckOut);
         btnPanel.add(btnRefresh);
-
         add(headerPanel, BorderLayout.NORTH);
         add(scroll, BorderLayout.CENTER);
         add(btnPanel, BorderLayout.SOUTH);
@@ -66,12 +57,16 @@ public class CheckOutPanel extends JPanel
     private void loadTable() 
     {
         model.setRowCount(0);
-        customers = FileUtil.load("customers.dat");
-        
+        customers = fileUtil.load("customers.dat");
         for (Customer c : customers) 
         {
             model.addRow(new Object[]{
-                c.getId(), c.getName(), c.getPhone(), c.getEmail(),c.getCheckIn(), c.getCheckOut()
+                c.getId(), 
+                c.getName(), 
+                c.getPhone(), 
+                c.getEmail(),
+                c.getCheckIn(), 
+                c.getCheckOut()
             });
         }
     }
@@ -91,7 +86,8 @@ public class CheckOutPanel extends JPanel
             if (confirm == JOptionPane.YES_OPTION) 
             {
                 Customer removedCustomer = customers.remove(row);
-                FileUtil.save("customers.dat", customers);
+                // Use fileUtil instance instead of static call
+                fileUtil.save("customers.dat", customers);
                 loadTable();
                 
                 JOptionPane.showMessageDialog(this,

@@ -10,6 +10,7 @@ public class AdminDashboard extends JFrame
     private JPanel mainContentPanel;
     private CardLayout cardLayout;
     private JLabel statusLabel;
+    private FileUtil fileUtil; 
     public AdminDashboard() 
     {
         UITheme.apply();
@@ -18,13 +19,14 @@ public class AdminDashboard extends JFrame
         setLocationRelativeTo(null);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
+        fileUtil = FileUtil.getInstance();
         JPanel mainPanel = new JPanel(new BorderLayout());
         mainPanel.setBackground(UITheme.DARK_BG);
         JPanel headerPanel = createHeaderPanel();
         JPanel sidebarPanel = createSidebarPanel();
         cardLayout = new CardLayout();
         mainContentPanel = new JPanel(cardLayout);
-        mainContentPanel.setBackground(UITheme.CARD_BG);
+        mainContentPanel.setBackground(UITheme.CARD_BG); 
         initializePanels();
         JPanel statusPanel = new JPanel(new BorderLayout());
         statusPanel.setBackground(UITheme.SECONDARY_COLOR);
@@ -74,7 +76,7 @@ public class AdminDashboard extends JFrame
         sidebar.setLayout(new BoxLayout(sidebar, BoxLayout.Y_AXIS));
         sidebar.setBackground(UITheme.SECONDARY_COLOR);
         sidebar.setPreferredSize(new Dimension(250, 0));
-        sidebar.setBorder(BorderFactory.createEmptyBorder(20, 10, 20, 10));
+        sidebar.setBorder(BorderFactory.createEmptyBorder(20, 10, 20, 10)); 
         JButton btnDashboard = createMenuButton("Dashboard", "dashboard");
         btnDashboard.setBackground(UITheme.PRIMARY_COLOR);
         JButton btnEmployees = createMenuButton("Employee Management", "employees");
@@ -82,8 +84,6 @@ public class AdminDashboard extends JFrame
         JButton btnDrivers = createMenuButton("Driver Management", "drivers");
         JButton btnCustomers = createMenuButton("Customer Management", "customers");
         JButton btnReservations = createMenuButton("Reservation Management", "reservations");
-        sidebar.add(btnReservations);
-        sidebar.add(Box.createRigidArea(new Dimension(0, 10)));
         JButton btnReports = createMenuButton("Reports & Analytics", "reports");
         JButton btnSettings = createMenuButton("System Settings", "settings");
         sidebar.add(btnDashboard);
@@ -96,10 +96,12 @@ public class AdminDashboard extends JFrame
         sidebar.add(Box.createRigidArea(new Dimension(0, 10)));
         sidebar.add(btnCustomers);
         sidebar.add(Box.createRigidArea(new Dimension(0, 10)));
+        sidebar.add(btnReservations);
+        sidebar.add(Box.createRigidArea(new Dimension(0, 10)));
         sidebar.add(btnReports);
         sidebar.add(Box.createRigidArea(new Dimension(0, 10)));
         sidebar.add(btnSettings);
-        sidebar.add(Box.createVerticalGlue());
+        sidebar.add(Box.createVerticalGlue()); 
         return sidebar;
     }
     private JButton createMenuButton(String text, String cardName) 
@@ -114,7 +116,6 @@ public class AdminDashboard extends JFrame
         button.setBorder(BorderFactory.createEmptyBorder(10, 15, 10, 15));
         button.setHorizontalAlignment(SwingConstants.LEFT);
         button.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        
         button.addActionListener(new ActionListener() 
         {
             @Override
@@ -125,7 +126,6 @@ public class AdminDashboard extends JFrame
                 highlightActiveButton(button);
             }
         });
-        
         button.addMouseListener(new java.awt.event.MouseAdapter() 
         {
             public void mouseEntered(java.awt.event.MouseEvent evt) 
@@ -174,7 +174,6 @@ public class AdminDashboard extends JFrame
     
     private void highlightActiveButton(JButton activeButton) 
     {
-        
         for (Component comp : ((JPanel)activeButton.getParent()).getComponents()) 
         {
             if (comp instanceof JButton) 
@@ -182,21 +181,19 @@ public class AdminDashboard extends JFrame
                 comp.setBackground(UITheme.CARD_BG);
             }
         }
-        
         activeButton.setBackground(UITheme.PRIMARY_COLOR);
     }
     
     private void initializePanels() 
     {
-      
         JPanel dashboardPanel = createDashboardPanel();
         mainContentPanel.add(dashboardPanel, "dashboard");
         EmployeePanel employeePanel = new EmployeePanel();
-        mainContentPanel.add(employeePanel, "employees");
+        mainContentPanel.add(employeePanel, "employees"); 
         RoomPanel roomPanel = new RoomPanel();
-        mainContentPanel.add(roomPanel, "rooms");
+        mainContentPanel.add(roomPanel, "rooms"); 
         DriverPanel driverPanel = new DriverPanel();
-        mainContentPanel.add(driverPanel, "drivers");
+        mainContentPanel.add(driverPanel, "drivers"); 
         CustomerFormPanel customerPanel = new CustomerFormPanel();
         mainContentPanel.add(customerPanel, "customers");
         ReservationPanel reservationPanel = new ReservationPanel();
@@ -205,26 +202,21 @@ public class AdminDashboard extends JFrame
         mainContentPanel.add(reportsPanel, "reports");
         JPanel settingsPanel = createSettingsPanel();
         mainContentPanel.add(settingsPanel, "settings");
-
     }
     
     private JPanel createDashboardPanel()
-     {
+    {
         JPanel panel = new JPanel(new BorderLayout());
         panel.setBackground(UITheme.CARD_BG);
-        
         JLabel title = new JLabel("Dashboard Overview", SwingConstants.CENTER);
         title.setFont(UITheme.HEADER_FONT);
         title.setForeground(UITheme.TEXT_COLOR);
         title.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0));
-        
-    
-        ArrayList<Employee> employees = FileUtil.load("employees.dat");
-        ArrayList<HotelRoom> rooms = FileUtil.load("rooms.dat");
-        ArrayList<Customer> customers = FileUtil.load("customers.dat");
-        
+        ArrayList<Employee> employees = fileUtil.load("employees.dat");
+        ArrayList<HotelRoom> rooms = fileUtil.load("rooms.dat");
+        ArrayList<Customer> customers = fileUtil.load("customers.dat");
         int totalEmployees = employees.size();
-        
+  
         int availableRooms = 0;
         for (HotelRoom room : rooms) 
         {
@@ -245,15 +237,18 @@ public class AdminDashboard extends JFrame
             }
         }
         int occupiedRooms = rooms.size() - availableRooms;
+        
         JPanel statsPanel = new JPanel(new GridLayout(2, 3, 15, 15));
         statsPanel.setBackground(UITheme.CARD_BG);
         statsPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        
         statsPanel.add(createStatCard("Total Employees", String.valueOf(totalEmployees), UITheme.PRIMARY_COLOR));
         statsPanel.add(createStatCard("Available Rooms", String.valueOf(availableRooms), UITheme.SUCCESS_COLOR));
         statsPanel.add(createStatCard("Total Customers", String.valueOf(totalCustomers), UITheme.WARNING_COLOR));
         statsPanel.add(createStatCard("Occupied Rooms", String.valueOf(occupiedRooms), UITheme.SECONDARY_COLOR));
         statsPanel.add(createStatCard("Revenue Today", String.format("$%.2f", revenueToday), new Color(155, 89, 182)));
         statsPanel.add(createStatCard("Cleaning Issues", String.valueOf(issues), UITheme.DANGER_COLOR));
+        
         JPanel activityPanel = new JPanel(new BorderLayout());
         activityPanel.setBackground(new Color(50, 50, 50));
         activityPanel.setBorder(BorderFactory.createTitledBorder(
@@ -263,6 +258,7 @@ public class AdminDashboard extends JFrame
             UITheme.NORMAL_FONT,
             UITheme.TEXT_COLOR
         ));
+        
         DefaultListModel<String> activityListModel = new DefaultListModel<>();
         
         int customerCount = Math.min(customers.size(), 3);
@@ -271,12 +267,14 @@ public class AdminDashboard extends JFrame
             Customer customer = customers.get(i);
             activityListModel.addElement("Customer " + customer.getName() + " checked in");
         }
+        
         int employeeCount = Math.min(employees.size(), 2);
         for (int i = Math.max(0, employees.size() - employeeCount); i < employees.size(); i++) 
         {
             Employee employee = employees.get(i);
             activityListModel.addElement("Employee " + employee.getName() + " added");
         }
+        
         for (HotelRoom room : rooms) 
         {
             if (!room.cleaned && activityListModel.size() < 6) 
@@ -284,7 +282,6 @@ public class AdminDashboard extends JFrame
                 activityListModel.addElement("Room " + room.roomNo + " needs cleaning");
             }
         }
-        
         
         if (activityListModel.isEmpty()) 
         {
@@ -297,7 +294,6 @@ public class AdminDashboard extends JFrame
         activityList.setFont(UITheme.SMALL_FONT);
         JScrollPane scrollPane = new JScrollPane(activityList);
         
-        
         JPanel refreshPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         refreshPanel.setBackground(new Color(50, 50, 50));
         JButton refreshBtn = new JButton("Refresh Dashboard");
@@ -305,9 +301,7 @@ public class AdminDashboard extends JFrame
         refreshBtn.setForeground(Color.WHITE);
         refreshBtn.setFocusPainted(false);
         refreshBtn.addActionListener(e -> {
-            
             cardLayout.show(mainContentPanel, "dashboard");
-            
             mainContentPanel.removeAll();
             initializePanels();
             cardLayout.show(mainContentPanel, "dashboard");
@@ -359,15 +353,20 @@ public class AdminDashboard extends JFrame
         JLabel title = new JLabel("Reports & Analytics");
         title.setFont(UITheme.HEADER_FONT);
         title.setForeground(UITheme.TEXT_COLOR);
+        
         JTabbedPane tabbedPane = new JTabbedPane();
         tabbedPane.setBackground(UITheme.CARD_BG);
         tabbedPane.setForeground(UITheme.TEXT_COLOR);
+        
         JPanel financialPanel = createFinancialReport();
         tabbedPane.addTab("Financial", financialPanel);
+        
         JPanel occupancyPanel = createOccupancyReport();
         tabbedPane.addTab("Occupancy", occupancyPanel);
+        
         JPanel employeePanel = createEmployeeReport();
         tabbedPane.addTab("Employee", employeePanel);
+        
         JPanel exportPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         exportPanel.setBackground(UITheme.CARD_BG);
         JButton btnExportPDF = createStyledButton("Export PDF", UITheme.PRIMARY_COLOR);
@@ -387,14 +386,14 @@ public class AdminDashboard extends JFrame
         JPanel panel = new JPanel(new BorderLayout());
         panel.setBackground(UITheme.CARD_BG);
         
-        
-        ArrayList<Customer> customers = FileUtil.load("customers.dat");
-        ArrayList<HotelRoom> rooms = FileUtil.load("rooms.dat");
-        
+      
+        ArrayList<Customer> customers = fileUtil.load("customers.dat");
+        ArrayList<HotelRoom> rooms = fileUtil.load("rooms.dat");
         
         double totalRevenue = customers.size() * 100.0; 
         double avgRevenuePerCustomer = customers.size() > 0 ? totalRevenue / customers.size() : 0;
         int totalBookings = customers.size();
+        
         String reportText = String.format(
             "FINANCIAL REPORT\n" +
             "================\n\n" +
@@ -427,7 +426,8 @@ public class AdminDashboard extends JFrame
         JPanel panel = new JPanel(new BorderLayout());
         panel.setBackground(UITheme.CARD_BG);
         
-        ArrayList<HotelRoom> rooms = FileUtil.load("rooms.dat");
+        // Use fileUtil instance
+        ArrayList<HotelRoom> rooms = fileUtil.load("rooms.dat");
         
         int totalRooms = rooms.size();
         int availableRooms = 0;
@@ -471,7 +471,6 @@ public class AdminDashboard extends JFrame
             totalRooms, availableRooms, occupiedRooms, occupancyRate, cleanRooms, dirtyRooms
         );
         
-        
         for (HotelRoom room : rooms) 
         {
             reportText += String.format("Room %d: %s, %s\n",
@@ -496,7 +495,8 @@ public class AdminDashboard extends JFrame
         JPanel panel = new JPanel(new BorderLayout());
         panel.setBackground(UITheme.CARD_BG);
         
-        ArrayList<Employee> employees = FileUtil.load("employees.dat");
+        // Use fileUtil instance
+        ArrayList<Employee> employees = fileUtil.load("employees.dat");
         
         String reportText = "EMPLOYEE REPORT\n" +
                            "================\n\n" +
@@ -530,7 +530,8 @@ public class AdminDashboard extends JFrame
     
     private int getAvailableRoomCount() 
     {
-        ArrayList<HotelRoom> rooms = FileUtil.load("rooms.dat");
+        // Use fileUtil instance
+        ArrayList<HotelRoom> rooms = fileUtil.load("rooms.dat");
         int count = 0;
         for (HotelRoom room : rooms) 
         {
@@ -544,7 +545,8 @@ public class AdminDashboard extends JFrame
     
     private double calculateOccupancyRate() 
     {
-        ArrayList<HotelRoom> rooms = FileUtil.load("rooms.dat");
+        // Use fileUtil instance
+        ArrayList<HotelRoom> rooms = fileUtil.load("rooms.dat");
         if (rooms.isEmpty()) return 0;
         
         int occupied = 0;
@@ -557,7 +559,6 @@ public class AdminDashboard extends JFrame
         }
         return (occupied * 100.0) / rooms.size();
     }
-    
     private JPanel createSettingsPanel() 
     {
         JPanel panel = new JPanel(new BorderLayout());
@@ -574,16 +575,13 @@ public class AdminDashboard extends JFrame
         gbc.insets = new Insets(10, 10, 10, 10);
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.anchor = GridBagConstraints.WEST;
-        
-        
         gbc.gridx = 0; gbc.gridy = 0;
         settingsForm.add(createSettingsLabel("Hotel Name:"), gbc);
         gbc.gridx = 1;
         JTextField hotelNameField = new JTextField("Grand Hotel");
         hotelNameField.setBackground(UITheme.CARD_BG);
         hotelNameField.setForeground(UITheme.TEXT_COLOR);
-        settingsForm.add(hotelNameField, gbc);
-        
+        settingsForm.add(hotelNameField, gbc);  
         gbc.gridx = 0; gbc.gridy = 1;
         settingsForm.add(createSettingsLabel("Admin Email:"), gbc);
         gbc.gridx = 1;
@@ -591,16 +589,13 @@ public class AdminDashboard extends JFrame
         emailField.setBackground(UITheme.CARD_BG);
         emailField.setForeground(UITheme.TEXT_COLOR);
         settingsForm.add(emailField, gbc);
-        
         gbc.gridx = 0; gbc.gridy = 2;
         settingsForm.add(createSettingsLabel("Backup Frequency:"), gbc);
         gbc.gridx = 1;
         JComboBox<String> backupCombo = new JComboBox<>(new String[]{"Daily", "Weekly", "Monthly"});
         backupCombo.setBackground(UITheme.CARD_BG);
         backupCombo.setForeground(UITheme.TEXT_COLOR);
-        settingsForm.add(backupCombo, gbc);
-        
-        
+        settingsForm.add(backupCombo, gbc); 
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         buttonPanel.setBackground(UITheme.CARD_BG);
         JButton btnSave = createStyledButton("Save Settings", UITheme.SUCCESS_COLOR);

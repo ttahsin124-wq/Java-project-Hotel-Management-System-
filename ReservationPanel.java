@@ -6,7 +6,6 @@ import javax.swing.table.*;
 
 public class ReservationPanel extends JPanel 
 {
-
     private DefaultTableModel model;
     private ArrayList<Reservation> reservations;
     private ArrayList<Customer> customers;
@@ -19,27 +18,29 @@ public class ReservationPanel extends JPanel
     private JComboBox<String> statusCombo;
     private JButton addButton, editButton, deleteButton, clearButton;
     private int selectedRow = -1;
-    private HotelRoom selectedRoomForEditing = null; 
+    private HotelRoom selectedRoomForEditing = null;
+    private FileUtil fileUtil; 
     public ReservationPanel() 
     {
         setLayout(new BorderLayout());
         setBackground(UITheme.CARD_BG);
-        reservations = FileUtil.load("reservations.dat");
-        customers = FileUtil.load("customers.dat");
-        rooms = FileUtil.load("rooms.dat");
+        fileUtil = FileUtil.getInstance();
+        reservations = fileUtil.load("reservations.dat");
+        customers = fileUtil.load("customers.dat");
+        rooms = fileUtil.load("rooms.dat");
         JPanel headerPanel = new JPanel(new BorderLayout());
         headerPanel.setBackground(UITheme.DARK_BG);
         headerPanel.setBorder(BorderFactory.createEmptyBorder(15, 20, 15, 20));
         JLabel title = new JLabel("Reservation Management");
         title.setFont(UITheme.HEADER_FONT);
         title.setForeground(Color.WHITE);
-        headerPanel.add(title, BorderLayout.WEST);
+        headerPanel.add(title, BorderLayout.WEST); 
         JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
         splitPane.setDividerLocation(450);
         splitPane.setBackground(UITheme.CARD_BG);
         splitPane.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         splitPane.setLeftComponent(createFormPanel());
-        splitPane.setRightComponent(createTablePanel());
+        splitPane.setRightComponent(createTablePanel()); 
         add(headerPanel, BorderLayout.NORTH);
         add(splitPane, BorderLayout.CENTER);
     }
@@ -49,8 +50,10 @@ public class ReservationPanel extends JPanel
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         panel.setBackground(UITheme.CARD_BG);
         panel.setBorder(BorderFactory.createTitledBorder(
-            BorderFactory.createLineBorder(UITheme.PRIMARY_COLOR, 2),"Reservation Form",0, 0, UITheme.HEADER_FONT, UITheme.TEXT_COLOR));
-        panel.setBorder(BorderFactory.createCompoundBorder(panel.getBorder(),BorderFactory.createEmptyBorder(20, 20, 20, 20)));
+            BorderFactory.createLineBorder(UITheme.PRIMARY_COLOR, 2), "Reservation Form",  0, 0, UITheme.HEADER_FONT, UITheme.TEXT_COLOR));
+        panel.setBorder(BorderFactory.createCompoundBorder(
+            panel.getBorder(),
+            BorderFactory.createEmptyBorder(20, 20, 20, 20)));
 
         customerCombo = new JComboBox<>();
         updateCustomerCombo();
@@ -68,7 +71,7 @@ public class ReservationPanel extends JPanel
         requestsArea.setBackground(UITheme.CARD_BG);
         requestsArea.setForeground(UITheme.TEXT_COLOR);
         requestsArea.setFont(UITheme.NORMAL_FONT);
-        requestsArea.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(new Color(100, 100, 100)),BorderFactory.createEmptyBorder(5, 5, 5, 5)));
+        requestsArea.setBorder(BorderFactory.createCompoundBorder( BorderFactory.createLineBorder(new Color(100, 100, 100)), BorderFactory.createEmptyBorder(5, 5, 5, 5)));
         panel.add(createFormRow("Customer:", customerCombo));
         panel.add(Box.createRigidArea(new Dimension(0, 12)));
         panel.add(createFormRow("Room:", roomCombo));
@@ -82,7 +85,7 @@ public class ReservationPanel extends JPanel
         panel.add(createFormRow("Status:", statusCombo));
         panel.add(Box.createRigidArea(new Dimension(0, 12)));
         panel.add(createFormRow("Special Requests:", new JScrollPane(requestsArea)));
-        panel.add(Box.createRigidArea(new Dimension(0, 25)));
+        panel.add(Box.createRigidArea(new Dimension(0, 25))); 
         JPanel buttonPanel = new JPanel(new GridLayout(2, 2, 10, 10));
         buttonPanel.setBackground(UITheme.CARD_BG);
         addButton = UITheme.createStyledButton("Add Reservation", UITheme.SUCCESS_COLOR);
@@ -106,7 +109,7 @@ public class ReservationPanel extends JPanel
     private void updateCustomerCombo() 
     {
         customerCombo.removeAllItems();
-        customers = FileUtil.load("customers.dat");
+        customers = fileUtil.load("customers.dat");
         for (Customer customer : customers) 
         {
             customerCombo.addItem(customer);
@@ -117,11 +120,12 @@ public class ReservationPanel extends JPanel
     private void updateRoomCombo(boolean forAddMode) 
     {
         roomCombo.removeAllItems();
-        rooms = FileUtil.load("rooms.dat");
+        rooms = fileUtil.load("rooms.dat"); 
         if (!forAddMode && selectedRoomForEditing != null) 
         {
             roomCombo.addItem(selectedRoomForEditing);
         }
+        
         for (HotelRoom room : rooms) 
         {
             if (room.available) 
@@ -156,7 +160,6 @@ public class ReservationPanel extends JPanel
         rowPanel.add(field, BorderLayout.CENTER);
         return rowPanel;
     }
-
     private void styleComboBox(JComboBox<?> comboBox) 
     {
         comboBox.setBackground(UITheme.CARD_BG);
@@ -167,8 +170,9 @@ public class ReservationPanel extends JPanel
             @Override
             public Component getListCellRendererComponent(JList<?> list, Object value, 
                     int index, boolean isSelected, boolean cellHasFocus) 
-                {
-                JLabel label = (JLabel) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+            {
+                JLabel label = (JLabel) super.getListCellRendererComponent(
+                    list, value, index, isSelected, cellHasFocus);
                 label.setBackground(isSelected ? UITheme.PRIMARY_COLOR : UITheme.CARD_BG);
                 label.setForeground(UITheme.TEXT_COLOR);
                 if (value instanceof Customer) 
@@ -180,7 +184,8 @@ public class ReservationPanel extends JPanel
                 {
                     HotelRoom room = (HotelRoom) value;
                     String availability = room.available ? "Available" : "Occupied";
-                    label.setText("Room " + room.roomNo + " - " + room.category + " ($" + room.price + ") [" + availability + "]");
+                    label.setText("Room " + room.roomNo + " - " + room.category + 
+                                 " ($" + room.price + ") [" + availability + "]");
                 }
                 return label;
             }
@@ -247,10 +252,13 @@ public class ReservationPanel extends JPanel
         header.setForeground(Color.WHITE);
         header.setFont(UITheme.NORMAL_FONT);
         JScrollPane scrollPane = new JScrollPane(table);
-        scrollPane.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(UITheme.SECONDARY_COLOR, 2),"Reservation List (" + reservations.size() + ")",0, 0, UITheme.HEADER_FONT, UITheme.TEXT_COLOR));
+        scrollPane.setBorder(BorderFactory.createTitledBorder(
+            BorderFactory.createLineBorder(UITheme.SECONDARY_COLOR, 2),
+            "Reservation List (" + reservations.size() + ")",
+            0, 0, UITheme.HEADER_FONT, UITheme.TEXT_COLOR));
+        
         return scrollPane;
     }
-
     private void addReservation() 
     {
         try 
@@ -301,11 +309,11 @@ public class ReservationPanel extends JPanel
             }
             Reservation reservation = new Reservation(newId, customer, room, checkIn, checkOut, amount, status, requests);
             room.available = false;
-            FileUtil.save("rooms.dat", rooms);
+            fileUtil.save("rooms.dat", rooms);
             reservations.add(reservation);
-            FileUtil.save("reservations.dat", reservations);
+            fileUtil.save("reservations.dat", reservations);
             customer.setRoomNumber(room.roomNo);
-            FileUtil.save("customers.dat", customers);
+            fileUtil.save("customers.dat", customers);
             model.addRow(new Object[]{
                 reservation.getReservationId(),
                 customer.getName(),
@@ -378,9 +386,9 @@ public class ReservationPanel extends JPanel
                 oldRoom.available = true;
                 room.available = false;
             }
-            FileUtil.save("rooms.dat", rooms);
-            FileUtil.save("customers.dat", customers);
-            FileUtil.save("reservations.dat", reservations);
+            fileUtil.save("rooms.dat", rooms);
+            fileUtil.save("customers.dat", customers);
+            fileUtil.save("reservations.dat", reservations);
             model.setValueAt(reservation.getReservationId(), selectedRow, 0);
             model.setValueAt(customer.getName(), selectedRow, 1);
             model.setValueAt("Room " + room.roomNo, selectedRow, 2);
@@ -393,6 +401,7 @@ public class ReservationPanel extends JPanel
             editButton.setEnabled(false);
             deleteButton.setEnabled(false);
             addButton.setEnabled(true);
+            
             JOptionPane.showMessageDialog(this, "Reservation updated successfully!");
         } 
         catch (NumberFormatException e) 
@@ -414,24 +423,28 @@ public class ReservationPanel extends JPanel
             return;
         }
         
-        int confirm = JOptionPane.showConfirmDialog(this,"Are you sure you want to delete this reservation?\nThis action cannot be undone.","Confirm Deletion",JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+        int confirm = JOptionPane.showConfirmDialog(this,
+            "Are you sure you want to delete this reservation?\nThis action cannot be undone.",
+            "Confirm Deletion",
+            JOptionPane.YES_NO_OPTION, 
+            JOptionPane.WARNING_MESSAGE);
+            
         if (confirm == JOptionPane.YES_OPTION) 
-            {
+        {
             Reservation reservation = reservations.remove(selectedRow);
             reservation.getRoom().available = true;
-            FileUtil.save("rooms.dat", rooms);
+            fileUtil.save("rooms.dat", rooms);
             reservation.getCustomer().setRoomNumber(0);
-            FileUtil.save("customers.dat", customers);
-            FileUtil.save("reservations.dat", reservations);
+            fileUtil.save("customers.dat", customers);
+            fileUtil.save("reservations.dat", reservations); 
             model.removeRow(selectedRow);
             selectedRow = -1;
             clearForm();
             updateRoomCombo(true); 
             editButton.setEnabled(false);
             deleteButton.setEnabled(false);
-            addButton.setEnabled(true);
-            JOptionPane.showMessageDialog(this, 
-                "Reservation #" + reservation.getReservationId() + " deleted successfully!");
+            addButton.setEnabled(true); 
+            JOptionPane.showMessageDialog(this, "Reservation #" + reservation.getReservationId() + " deleted successfully!");
         }
     }
 
@@ -452,6 +465,7 @@ public class ReservationPanel extends JPanel
                 }
             }
             updateRoomCombo(false);
+
             for (int i = 0; i < roomCombo.getItemCount(); i++) 
             {
                 HotelRoom comboRoom = roomCombo.getItemAt(i);
@@ -461,7 +475,6 @@ public class ReservationPanel extends JPanel
                     break;
                 }
             }
-            
             checkInSpinner.setValue(reservation.getCheckIn());
             checkOutSpinner.setValue(reservation.getCheckOut());
             amountField.setText(String.valueOf(reservation.getTotalAmount()));
@@ -489,7 +502,7 @@ public class ReservationPanel extends JPanel
     private void loadReservationsToTable() 
     {
         model.setRowCount(0);
-        reservations = FileUtil.load("reservations.dat");
+        reservations = fileUtil.load("reservations.dat");
         for (Reservation reservation : reservations) 
         {
             model.addRow(new Object[]{

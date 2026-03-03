@@ -5,15 +5,17 @@ import javax.swing.table.*;
 
 public class CustomerListPanel extends JPanel 
 {
-
-    private  JTable table;
-    private  DefaultTableModel model;
+    private JTable table;
+    private DefaultTableModel model;
     private ArrayList<Customer> customers;
+    private FileUtil fileUtil;  
+
     public CustomerListPanel() 
     {
         setLayout(new BorderLayout());
         setBackground(UITheme.CARD_BG);
-        customers = FileUtil.load("customers.dat");
+        fileUtil = FileUtil.getInstance();
+        customers = fileUtil.load("customers.dat");
         JPanel headerPanel = new JPanel(new BorderLayout());
         headerPanel.setBackground(UITheme.PRIMARY_COLOR);
         headerPanel.setBorder(BorderFactory.createEmptyBorder(15, 20, 15, 20));
@@ -36,22 +38,30 @@ public class CustomerListPanel extends JPanel
         table.setFont(UITheme.SMALL_FONT);
         table.setSelectionBackground(UITheme.PRIMARY_COLOR);
         table.setSelectionForeground(Color.WHITE);
+        
         JTableHeader header = table.getTableHeader();
         header.setBackground(UITheme.SECONDARY_COLOR);
         header.setForeground(Color.WHITE);
         header.setFont(UITheme.NORMAL_FONT);
+        
         add(headerPanel, BorderLayout.NORTH);
         add(new JScrollPane(table), BorderLayout.CENTER);
     }
+    
     private void loadTable() 
     {
         model.setRowCount(0);
-        customers = FileUtil.load("customers.dat");
+        customers = fileUtil.load("customers.dat");
         for (Customer c : customers) 
         {
             model.addRow(new Object[]
             {
-                c.getId(), c.getName(), c.getPhone(), c.getEmail(),c.getCheckIn(), c.getCheckOut()
+                c.getId(), 
+                c.getName(), 
+                c.getPhone(), 
+                c.getEmail(),
+                c.getCheckIn(), 
+                c.getCheckOut()
             });
         }
     }
