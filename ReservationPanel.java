@@ -20,6 +20,7 @@ public class ReservationPanel extends JPanel
     private JButton addButton, editButton, deleteButton, clearButton;
     private int selectedRow = -1;
     private HotelRoom selectedRoomForEditing = null; 
+    private JComboBox<String>pricingCombo;
     public ReservationPanel() 
     {
         setLayout(new BorderLayout());
@@ -64,6 +65,8 @@ public class ReservationPanel extends JPanel
         statusCombo = UITheme.createStyledComboBox(
             new String[]{"CONFIRMED", "CHECKED_IN", "CHECKED_OUT", "CANCELLED"}
         );
+        pricingCombo=UITheme.createStyledComboBox(new String[]{"Regular","Discount","Seasonal"});
+        
         requestsArea = new JTextArea(3, 20);
         requestsArea.setBackground(UITheme.CARD_BG);
         requestsArea.setForeground(UITheme.TEXT_COLOR);
@@ -76,6 +79,9 @@ public class ReservationPanel extends JPanel
         panel.add(createFormRow("Check-in:", checkInSpinner));
         panel.add(Box.createRigidArea(new Dimension(0, 12)));
         panel.add(createFormRow("Check-out:", checkOutSpinner));
+
+        panel.add(createFormRow("Pricing Type:", pricingCombo));
+        panel.add(Box.createRigidArea(new Dimension(0, 12)));
         panel.add(Box.createRigidArea(new Dimension(0, 12)));
         panel.add(createFormRow("Total Amount:", amountField));
         panel.add(Box.createRigidArea(new Dimension(0, 12)));
@@ -253,6 +259,7 @@ public class ReservationPanel extends JPanel
 
     private void addReservation() 
     {
+        PricingStrategy strategy;
         try 
         {
             Customer customer = (Customer) customerCombo.getSelectedItem();
@@ -262,6 +269,7 @@ public class ReservationPanel extends JPanel
             double amount = Double.parseDouble(amountField.getText().trim());
             String status = (String) statusCombo.getSelectedItem();
             String requests = requestsArea.getText().trim();
+            String selectedPricing = (String) pricingCombo.getSelectedItem();
             if (customer == null) 
             {
                 JOptionPane.showMessageDialog(this, "Please select a customer!");
@@ -299,7 +307,24 @@ public class ReservationPanel extends JPanel
                 }
                 newId++; 
             }
+            if (selectedPricing.equals("Discount")) 
+            {
+                strategy = new DiscountPricing();
+            }
+            else if (selectedPricing.equals("Seasonal")) {
+                strategy = new SeasonalPricing();
+            }
+            else
+            {
+                strategy = new RegularPricing();
+            }
+            
+            
             Reservation reservation = new Reservation(newId, customer, room, checkIn, checkOut, amount, status, requests);
+            reservation.setPricingStrategy(strategy);
+
+            double totalAmount = reservation.calculateTotalAmount();
+            reservation.setTotalAmount(totalAmount);
             room.available = false;
             FileUtil.save("rooms.dat", rooms);
             reservations.add(reservation);
