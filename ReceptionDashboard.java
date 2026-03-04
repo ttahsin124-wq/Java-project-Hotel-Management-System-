@@ -546,8 +546,7 @@ public class ReceptionDashboard extends JFrame {
                 PickupResult r = facade.requestPickup(id, loc);
                 resultArea.setText(r.success ? 
                     String.format("Driver %s assigned\nCar: %s %s", 
-                        r.driver.getName(), r.driver.getCarCompany(), r.driver.getCarName()) :
-                    "XX " + r.message);
+                        r.driver.getName(), r.driver.getCarCompany(), r.driver.getCarName()) :"XX " + r.message);
             } catch (NumberFormatException ex) {
                 JOptionPane.showMessageDialog(this, "Invalid ID!");
             }
@@ -560,7 +559,7 @@ public class ReceptionDashboard extends JFrame {
             setBackground(UITheme.CARD_BG);
             
             DashboardStats s = facade.getDashboardStats();
-            int rate = s.or == 0 ? 0 : (s.or * 100) / (s.ar + s.or);
+            int rate = s.or == 0 ? 0:(s.or*100)/(s.ar+s.or);
             
             String report = String.format(
                 "RECEPTION REPORT\n═══════════════\n\nCustomers: %d\nReservations: %d\nChecked-in: %d\nAvailable Rooms: %d\nOccupied: %d\nOccupancy: %d%%\n\nGenerated: %s",
@@ -625,8 +624,7 @@ public class ReceptionDashboard extends JFrame {
             add(new JScrollPane(area), BorderLayout.CENTER);
         }
     }
-
-    
+ 
     private JPanel createHeader(String title, Color bg) {
         JPanel p = new JPanel(new BorderLayout());
         p.setBackground(bg);
