@@ -404,12 +404,10 @@ public  class CustomerFormPanel extends JPanel implements DataRepository.Custome
                 customer.getName(),
                 customer.getPhone(),
                 customer.getEmail(),
-                customer.getRoomNumber() != null ? customer.getRoomNumber() : "Not assigned",
+                customer.getRoomNumber()!=null?customer.getRoomNumber():"Not assigned",
                 customer.getCheckIn(),
                 customer.getCheckOut()
             });
         }
     }
-
-  
 }
