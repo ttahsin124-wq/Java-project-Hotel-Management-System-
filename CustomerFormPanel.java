@@ -4,9 +4,9 @@ import java.util.Date;
 import javax.swing.*;
 import javax.swing.table.*;
 
-public class CustomerFormPanel extends JPanel 
+public  class CustomerFormPanel extends JPanel implements DataRepository.CustomerListener
 {
-
+    private DataRepository repo;
     private ArrayList<Customer> customers;
     private DefaultTableModel model;
     private JTextField txtId, txtName, txtPhone, txtEmail, txtRoomNumber;
@@ -17,9 +17,10 @@ public class CustomerFormPanel extends JPanel
 
     public CustomerFormPanel() 
     {
+        repo = DataRepository.getInstance();
+        customers = repo.getCustomers();
         setLayout(new BorderLayout());
         setBackground(UITheme.CARD_BG);
-        customers = FileUtil.load("customers.dat");
         JPanel headerPanel = new JPanel(new BorderLayout());
         headerPanel.setBackground(UITheme.DARK_BG);
         headerPanel.setBorder(BorderFactory.createEmptyBorder(15, 20, 15, 20));
@@ -35,7 +36,17 @@ public class CustomerFormPanel extends JPanel
         splitPane.setRightComponent(createTablePanel());
         add(headerPanel, BorderLayout.NORTH);
         add(splitPane, BorderLayout.CENTER);
+        repo.addCustomerListener(this);
     
+    }
+     @Override
+    public void onCustomerDataChanged() 
+    {
+        // Refresh the table when data changes
+        loadCustomersToTable();
+        
+        // Optional: Show a message in console
+        System.out.println("Customer data changed - table refreshed");
     }
 
     private JPanel createFormPanel() 
@@ -236,17 +247,7 @@ public class CustomerFormPanel extends JPanel
                 }
             }
             Customer customer = new Customer(id, name, phone, email, checkIn, checkOut, roomNumber);
-            customers.add(customer);
-            FileUtil.save("customers.dat", customers);
-            model.addRow(new Object[]{
-                customer.getId(),
-                customer.getName(),
-                customer.getPhone(),
-                customer.getEmail(),
-                customer.getRoomNumber() != null ? customer.getRoomNumber() : "Not assigned",
-                customer.getCheckIn(),
-                customer.getCheckOut()
-            });
+            repo.addCustomer(customer);
             clearForm();
             JOptionPane.showMessageDialog(this, "Customer added successfully!\nID: " + id + "\nName: " + name, "Success", JOptionPane.INFORMATION_MESSAGE);
             
@@ -315,14 +316,8 @@ public class CustomerFormPanel extends JPanel
             customer.setCheckIn(checkIn);
             customer.setCheckOut(checkOut);
             customer.setRoomNumber(roomNumber);
-            FileUtil.save("customers.dat", customers);
-            model.setValueAt(customer.getId(), selectedRow, 0);
-            model.setValueAt(customer.getName(), selectedRow, 1);
-            model.setValueAt(customer.getPhone(), selectedRow, 2);
-            model.setValueAt(customer.getEmail(), selectedRow, 3);
-            model.setValueAt(customer.getRoomNumber() != null ? customer.getRoomNumber() : "Not assigned", selectedRow, 4);
-            model.setValueAt(customer.getCheckIn(), selectedRow, 5);
-            model.setValueAt(customer.getCheckOut(), selectedRow, 6);
+            repo.updateCustomer(selectedRow,customer);
+           
             clearForm();
             editButton.setEnabled(false);
             deleteButton.setEnabled(false);
@@ -352,9 +347,7 @@ public class CustomerFormPanel extends JPanel
         if (confirm == JOptionPane.YES_OPTION) 
         {
             Customer deletedCustomer = customers.remove(selectedRow);
-            FileUtil.save("customers.dat", customers);
-            model.removeRow(selectedRow);
-            selectedRow = -1;
+            repo.deleteCustomer(selectedRow);
             clearForm();
             editButton.setEnabled(false);
             deleteButton.setEnabled(false);
@@ -417,4 +410,6 @@ public class CustomerFormPanel extends JPanel
             });
         }
     }
+
+  
 }

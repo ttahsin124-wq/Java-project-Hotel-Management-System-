@@ -9,7 +9,7 @@ public class DataRepository {
     private ArrayList<HotelRoom> rooms;
     private ArrayList<Reservation> reservations;
     
-    // Listeners
+
     private List<CustomerListener> customerListeners = new ArrayList<>();
     private List<RoomListener> roomListeners = new ArrayList<>();
     private List<ReservationListener> reservationListeners = new ArrayList<>();
