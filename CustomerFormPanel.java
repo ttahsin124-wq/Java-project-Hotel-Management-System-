@@ -1,5 +1,4 @@
 import java.awt.*;
-
 import java.util.ArrayList;
 import java.util.Date;
 import javax.swing.*;
@@ -410,5 +409,12 @@ public  class CustomerFormPanel extends JPanel implements DataRepository.Custome
                 customer.getCheckOut()
             });
         }
+    }
+    public ArrayList<Customer> getCustomers() {
+        return customers;
+    }
+
+    public void setCustomers(ArrayList<Customer> newCustomers) {
+        this.customers = newCustomers;
     }
 }

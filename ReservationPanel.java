@@ -528,4 +528,11 @@ public class ReservationPanel extends JPanel
             });
         }
     }
+    public ArrayList<Reservation> getReservations() {
+        return reservations;
+    }
+
+    public void setReservations(ArrayList<Reservation> newReservations) {
+        this.reservations = newReservations;
+    }
 }

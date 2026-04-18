@@ -7,7 +7,10 @@ public class MainApp
 
         SwingUtilities.invokeLater(() -> 
         {
+            LoginFrame loginFrame = new LoginFrame();
             new LoginFrame().setVisible(true);
+            CommandManager.getInstance().setParentFrame(loginFrame);
+            
         });
     }
 }
