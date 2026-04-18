@@ -18,6 +18,9 @@ public class AdminDashboard extends JFrame
         setLocationRelativeTo(null);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
+
+        CommandIntegration.integrateWithAdminDashboard(this);
+
         JPanel mainPanel = new JPanel(new BorderLayout());
         mainPanel.setBackground(UITheme.DARK_BG);
         JPanel headerPanel = createHeaderPanel();

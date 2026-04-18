@@ -3,6 +3,7 @@ import java.util.Date;
 
 public class Reservation implements Serializable 
 {
+    private PricingStrategy pricingStrategy;
     private int reservationId;
     private Customer customer;
     private HotelRoom room;
@@ -88,5 +89,17 @@ public class Reservation implements Serializable
     public String toString() 
     {
         return "Reservation [ID=" + reservationId + ", Customer=" + customer.getName() +  ", Room=" + room.roomNo + ", Status=" + status + "]";
+    }
+    public void setPricingStrategy(PricingStrategy pricingStrategy)
+    {
+        this.pricingStrategy=pricingStrategy;
+    }
+    public double calculateTotalAmount() 
+    {
+        long diff = checkOut.getTime() - checkIn.getTime();
+        long days = diff / (1000 * 60 * 60 * 24);
+        if (days == 0) days = 1;
+
+        return pricingStrategy.calculatePrice(room, days);
     }
 }

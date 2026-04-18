@@ -300,4 +300,15 @@ public class RoomPanel extends JPanel
             });
         }
     }
+    public ArrayList<HotelRoom> getRooms() {
+    return rooms;
+    }
+
+    public void setRooms(ArrayList<HotelRoom> newRooms) {
+        this.rooms = newRooms;
+    }
+
+    public void saveRooms() {
+        FileUtil.save("rooms.dat", rooms);
+    }
 }
