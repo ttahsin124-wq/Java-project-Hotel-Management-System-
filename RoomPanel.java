@@ -117,6 +117,34 @@ public class RoomPanel extends JPanel
         buttonPanel.add(clearButton);
         panel.add(buttonPanel);
         
+        // Add Iterator Pattern Demo 
+        panel.add(Box.createRigidArea(new Dimension(0, 20)));
+        
+        JPanel demoPanel = new JPanel(new GridLayout(2, 2, 10, 10));
+        demoPanel.setBackground(UITheme.CARD_BG);
+        demoPanel.setBorder(BorderFactory.createTitledBorder(
+            BorderFactory.createLineBorder(new Color(155, 89, 182), 2),
+            "🔄 Iterator Pattern Demo",
+            0, 0, UITheme.NORMAL_FONT, UITheme.TEXT_COLOR
+        ));
+        
+        JButton btnAllRooms = UITheme.createStyledButton("Show All Rooms", new Color(155, 89, 182));
+        JButton btnAvailableRooms = UITheme.createStyledButton("Show Available Rooms", UITheme.SUCCESS_COLOR);
+        JButton btnDirtyRooms = UITheme.createStyledButton("Show Dirty Rooms", UITheme.DANGER_COLOR);
+        JButton btnCategoryRooms = UITheme.createStyledButton("Show by Category", UITheme.PRIMARY_COLOR);
+        
+        btnAllRooms.addActionListener(e -> displayAllRoomsWithIterator());
+        btnAvailableRooms.addActionListener(e -> displayAvailableRoomsWithIterator());
+        btnDirtyRooms.addActionListener(e -> displayDirtyRoomsWithIterator());
+        btnCategoryRooms.addActionListener(e -> displayRoomsByCategoryWithIterator());
+        
+        demoPanel.add(btnAllRooms);
+        demoPanel.add(btnAvailableRooms);
+        demoPanel.add(btnDirtyRooms);
+        demoPanel.add(btnCategoryRooms);
+        
+        panel.add(demoPanel);
+        
         return panel;
     }
     
@@ -303,9 +331,9 @@ public class RoomPanel extends JPanel
             RoomCategory category = RoomCategory.valueOf(categoryStr);
             
             if (room.roomNo != roomNo) 
-                {
+            {
                 for (HotelRoom r : rooms) 
-                    {
+                {
                     if (r.roomNo == roomNo && r != room) 
                     {
                         JOptionPane.showMessageDialog(this,
@@ -482,6 +510,161 @@ public class RoomPanel extends JPanel
                 "Total Rooms: " + rooms.size(),
                 "Initialization Complete",
                 JOptionPane.INFORMATION_MESSAGE);
+        }
+    }
+    
+   
+    private void displayAllRoomsWithIterator() 
+    {
+        RoomCollection roomCollection = new RoomCollection(rooms);
+        Iterator<HotelRoom> iterator = roomCollection.getAllRoomsIterator();
+        
+        StringBuilder message = new StringBuilder();
+        message.append("=== ALL ROOMS (Using Iterator Pattern) ===\n\n");
+        
+        int count = 0;
+        while (iterator.hasNext()) 
+        {
+            HotelRoom room = iterator.next();
+            count++;
+            message.append(String.format("%d. Room %d - %s - $%.2f - %s - %s\n",
+                count,
+                room.roomNo,
+                room.category,
+                room.price,
+                room.available ? "Available" : "Occupied",
+                room.cleaned ? "Clean" : "Needs Cleaning"
+            ));
+            
+            if (count >= 20 && rooms.size() > 20) 
+            {
+                message.append("\n... and ").append(rooms.size() - 20).append(" more rooms");
+                break;
+            }
+        }
+        
+        message.append("\n\n✅ Total Rooms: ").append(rooms.size());
+        message.append("\n📊 Iterator Pattern: Simple iteration through all rooms");
+        
+        JOptionPane.showMessageDialog(this, message.toString(), 
+            "Room Iterator Demo - All Rooms", JOptionPane.INFORMATION_MESSAGE);
+    }
+    
+    private void displayAvailableRoomsWithIterator() 
+    {
+        RoomCollection roomCollection = new RoomCollection(rooms);
+        Iterator<HotelRoom> iterator = roomCollection.getAvailableRoomsIterator();
+        
+        StringBuilder message = new StringBuilder();
+        message.append("=== AVAILABLE ROOMS ONLY (Filtered Iterator) ===\n\n");
+        
+        int count = 0;
+        while (iterator.hasNext()) 
+        {
+            HotelRoom room = iterator.next();
+            count++;
+            message.append(String.format("%d. Room %d - %s - $%.2f - %s\n",
+                count,
+                room.roomNo,
+                room.category,
+                room.price,
+                room.cleaned ? "Clean" : "Needs Cleaning"
+            ));
+        }
+        
+        if (count == 0) 
+        {
+            message.append("❌ No available rooms found!");
+        } 
+        else 
+        {
+            message.append("\n✅ Total Available Rooms: ").append(count);
+            message.append("\n📊 Iterator Pattern: Filtered iteration (Available filter applied)");
+        }
+        
+        JOptionPane.showMessageDialog(this, message.toString(), 
+            "Room Iterator Demo - Available Rooms", JOptionPane.INFORMATION_MESSAGE);
+    }
+    private void displayDirtyRoomsWithIterator() 
+    {
+        RoomCollection roomCollection = new RoomCollection(rooms);
+        Iterator<HotelRoom> iterator = roomCollection.getDirtyRoomsIterator();
+        
+        StringBuilder message = new StringBuilder();
+        message.append("=== ROOMS NEEDING CLEANING (Filtered Iterator) ===\n\n");
+        
+        int count = 0;
+        while (iterator.hasNext()) 
+        {
+            HotelRoom room = iterator.next();
+            count++;
+            message.append(String.format("%d. Room %d - %s - %s\n",
+                count,
+                room.roomNo,
+                room.category,
+                room.available ? "Available" : "Occupied"
+            ));
+        }
+        
+        if (count == 0) 
+        {
+            message.append("✅ All rooms are clean! Great job!");
+        } 
+        else 
+        {
+            message.append("\n⚠️ Total Rooms Needing Cleaning: ").append(count);
+            message.append("\n📊 Iterator Pattern: Filtered iteration (Dirty filter applied)");
+        }
+        
+        JOptionPane.showMessageDialog(this, message.toString(), 
+            "Room Iterator Demo - Dirty Rooms", JOptionPane.INFORMATION_MESSAGE);
+    }
+    private void displayRoomsByCategoryWithIterator() 
+    {
+        String[] categories = {"SINGLE", "DOUBLE", "DELUXE", "SUITE"};
+        String selected = (String) JOptionPane.showInputDialog(this,
+            "Select Room Category:",
+            "Filter by Category - Iterator Pattern",
+            JOptionPane.QUESTION_MESSAGE,
+            null,
+            categories,
+            categories[0]);
+        
+        if (selected != null) 
+        {
+            RoomCategory category = RoomCategory.valueOf(selected);
+            RoomCollection roomCollection = new RoomCollection(rooms);
+            Iterator<HotelRoom> iterator = roomCollection.getRoomsByCategoryIterator(category);
+            
+            StringBuilder message = new StringBuilder();
+            message.append("=== ").append(category).append(" ROOMS (Filtered Iterator) ===\n\n");
+            
+            int count = 0;
+            while (iterator.hasNext()) 
+            {
+                HotelRoom room = iterator.next();
+                count++;
+                message.append(String.format("%d. Room %d - $%.2f - %s - %s\n",
+                    count,
+                    room.roomNo,
+                    room.price,
+                    room.available ? "Available" : "Occupied",
+                    room.cleaned ? "Clean" : "Needs Cleaning"
+                ));
+            }
+            
+            if (count == 0) 
+            {
+                message.append("❌ No ").append(category).append(" rooms found!");
+            } 
+            else 
+            {
+                message.append("\n✅ Total ").append(category).append(" Rooms: ").append(count);
+                message.append("\n📊 Iterator Pattern: Filtered iteration (Category: ").append(category).append(")");
+            }
+            
+            JOptionPane.showMessageDialog(this, message.toString(), 
+                "Room Iterator Demo - " + category + " Rooms", JOptionPane.INFORMATION_MESSAGE);
         }
     }
 }
