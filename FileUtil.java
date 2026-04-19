@@ -10,12 +10,14 @@ public class FileUtil
     }
     public static synchronized FileUtil getInstance()
     {
-        if (instance == null) {
+        if (instance == null) 
+        {
             instance = new FileUtil();
         }
         return instance;
     }
-    public <T> void save(String file, ArrayList<T> list) {
+    public <T> void save(String file, ArrayList<T> list)
+     {
         try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(file))) 
         {
             oos.writeObject(list);
