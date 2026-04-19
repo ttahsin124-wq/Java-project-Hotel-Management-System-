@@ -10,7 +10,10 @@ public class AdminDashboard extends JFrame
     private JPanel mainContentPanel;
     private CardLayout cardLayout;
     private JLabel statusLabel;
-    private FileUtil fileUtil; 
+    private FileUtil fileUtil;
+    private ExportManager exportManager;
+    private JComboBox<String> exportFormatCombo;
+    
     public AdminDashboard() 
     {
         UITheme.apply();
@@ -19,31 +22,43 @@ public class AdminDashboard extends JFrame
         setLocationRelativeTo(null);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
+        
         fileUtil = FileUtil.getInstance();
+        exportManager = new ExportManager();
+        
         JPanel mainPanel = new JPanel(new BorderLayout());
         mainPanel.setBackground(UITheme.DARK_BG);
+        
         JPanel headerPanel = createHeaderPanel();
         JPanel sidebarPanel = createSidebarPanel();
+        
         cardLayout = new CardLayout();
         mainContentPanel = new JPanel(cardLayout);
         mainContentPanel.setBackground(UITheme.CARD_BG); 
+        
         initializePanels();
+        
         JPanel statusPanel = new JPanel(new BorderLayout());
         statusPanel.setBackground(UITheme.SECONDARY_COLOR);
         statusPanel.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
+        
         statusLabel = new JLabel("Ready");
         statusLabel.setForeground(UITheme.TEXT_COLOR);
         statusPanel.add(statusLabel, BorderLayout.WEST);
+        
         JLabel userLabel = new JLabel("Admin | " + new Date());
         userLabel.setForeground(UITheme.TEXT_COLOR);
         statusPanel.add(userLabel, BorderLayout.EAST);
+        
         mainPanel.add(headerPanel, BorderLayout.NORTH);
         mainPanel.add(sidebarPanel, BorderLayout.WEST);
         mainPanel.add(mainContentPanel, BorderLayout.CENTER);
         mainPanel.add(statusPanel, BorderLayout.SOUTH);
+        
         add(mainPanel);
         setVisible(true);
     }
+    
     private JPanel createHeaderPanel() 
     {
         JPanel header = new JPanel(new BorderLayout());
@@ -66,10 +81,12 @@ public class AdminDashboard extends JFrame
                 new LoginFrame().setVisible(true);
             }
         });
+        
         header.add(title, BorderLayout.WEST);
         header.add(logoutBtn, BorderLayout.EAST);
         return header;
     }
+    
     private JPanel createSidebarPanel() 
     {
         JPanel sidebar = new JPanel();
@@ -77,6 +94,7 @@ public class AdminDashboard extends JFrame
         sidebar.setBackground(UITheme.SECONDARY_COLOR);
         sidebar.setPreferredSize(new Dimension(250, 0));
         sidebar.setBorder(BorderFactory.createEmptyBorder(20, 10, 20, 10)); 
+        
         JButton btnDashboard = createMenuButton("Dashboard", "dashboard");
         btnDashboard.setBackground(UITheme.PRIMARY_COLOR);
         JButton btnEmployees = createMenuButton("Employee Management", "employees");
@@ -86,6 +104,7 @@ public class AdminDashboard extends JFrame
         JButton btnReservations = createMenuButton("Reservation Management", "reservations");
         JButton btnReports = createMenuButton("Reports & Analytics", "reports");
         JButton btnSettings = createMenuButton("System Settings", "settings");
+        
         sidebar.add(btnDashboard);
         sidebar.add(Box.createRigidArea(new Dimension(0, 10)));
         sidebar.add(btnEmployees);
@@ -102,8 +121,10 @@ public class AdminDashboard extends JFrame
         sidebar.add(Box.createRigidArea(new Dimension(0, 10)));
         sidebar.add(btnSettings);
         sidebar.add(Box.createVerticalGlue()); 
+        
         return sidebar;
     }
+    
     private JButton createMenuButton(String text, String cardName) 
     {
         JButton button = new JButton(text);
@@ -116,16 +137,18 @@ public class AdminDashboard extends JFrame
         button.setBorder(BorderFactory.createEmptyBorder(10, 15, 10, 15));
         button.setHorizontalAlignment(SwingConstants.LEFT);
         button.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        
         button.addActionListener(new ActionListener() 
         {
             @Override
             public void actionPerformed(ActionEvent e) 
             {
                 cardLayout.show(mainContentPanel, cardName);
-                statusLabel.setText("📍" + text);
+                statusLabel.setText("📍 " + text);
                 highlightActiveButton(button);
             }
         });
+        
         button.addMouseListener(new java.awt.event.MouseAdapter() 
         {
             public void mouseEntered(java.awt.event.MouseEvent evt) 
@@ -188,18 +211,25 @@ public class AdminDashboard extends JFrame
     {
         JPanel dashboardPanel = createDashboardPanel();
         mainContentPanel.add(dashboardPanel, "dashboard");
+        
         EmployeePanel employeePanel = new EmployeePanel();
         mainContentPanel.add(employeePanel, "employees"); 
+        
         RoomPanel roomPanel = new RoomPanel();
         mainContentPanel.add(roomPanel, "rooms"); 
+        
         DriverPanel driverPanel = new DriverPanel();
         mainContentPanel.add(driverPanel, "drivers"); 
+        
         CustomerFormPanel customerPanel = new CustomerFormPanel();
         mainContentPanel.add(customerPanel, "customers");
+        
         ReservationPanel reservationPanel = new ReservationPanel();
         mainContentPanel.add(reservationPanel, "reservations");
+        
         JPanel reportsPanel = createReportsPanel();
         mainContentPanel.add(reportsPanel, "reports");
+        
         JPanel settingsPanel = createSettingsPanel();
         mainContentPanel.add(settingsPanel, "settings");
     }
@@ -208,13 +238,16 @@ public class AdminDashboard extends JFrame
     {
         JPanel panel = new JPanel(new BorderLayout());
         panel.setBackground(UITheme.CARD_BG);
+        
         JLabel title = new JLabel("Dashboard Overview", SwingConstants.CENTER);
         title.setFont(UITheme.HEADER_FONT);
         title.setForeground(UITheme.TEXT_COLOR);
         title.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0));
+        
         ArrayList<Employee> employees = fileUtil.load("employees.dat");
         ArrayList<HotelRoom> rooms = fileUtil.load("rooms.dat");
         ArrayList<Customer> customers = fileUtil.load("customers.dat");
+        
         int totalEmployees = employees.size();
   
         int availableRooms = 0;
@@ -225,9 +258,10 @@ public class AdminDashboard extends JFrame
                 availableRooms++;
             }
         }
-        int totalCustomers = customers.size();
         
+        int totalCustomers = customers.size();
         double revenueToday = customers.size() * 100.0;
+        
         int issues = 0;
         for (HotelRoom room : rooms) 
         {
@@ -236,6 +270,7 @@ public class AdminDashboard extends JFrame
                 issues++;
             }
         }
+        
         int occupiedRooms = rooms.size() - availableRooms;
         
         JPanel statsPanel = new JPanel(new GridLayout(2, 3, 15, 15));
@@ -296,6 +331,7 @@ public class AdminDashboard extends JFrame
         
         JPanel refreshPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         refreshPanel.setBackground(new Color(50, 50, 50));
+        
         JButton refreshBtn = new JButton("Refresh Dashboard");
         refreshBtn.setBackground(UITheme.PRIMARY_COLOR);
         refreshBtn.setForeground(Color.WHITE);
@@ -307,6 +343,7 @@ public class AdminDashboard extends JFrame
             cardLayout.show(mainContentPanel, "dashboard");
             statusLabel.setText(" Dashboard refreshed");
         });
+        
         refreshPanel.add(refreshBtn);
         
         panel.add(title, BorderLayout.NORTH);
@@ -367,18 +404,236 @@ public class AdminDashboard extends JFrame
         JPanel employeePanel = createEmployeeReport();
         tabbedPane.addTab("Employee", employeePanel);
         
-        JPanel exportPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        exportPanel.setBackground(UITheme.CARD_BG);
-        JButton btnExportPDF = createStyledButton("Export PDF", UITheme.PRIMARY_COLOR);
-        JButton btnExportExcel = createStyledButton("Export Excel", UITheme.SUCCESS_COLOR);
-        exportPanel.add(btnExportPDF);
-        exportPanel.add(btnExportExcel);
+        // ADAPTER PATTERN IMPLEMENTATION - Export Panel
+        JPanel exportMainPanel = new JPanel(new BorderLayout());
+        exportMainPanel.setBackground(UITheme.CARD_BG);
+        exportMainPanel.setBorder(BorderFactory.createTitledBorder(
+            BorderFactory.createLineBorder(UITheme.SUCCESS_COLOR, 2),
+            "📤 Export Data (Adapter Pattern)",
+            0, 0, UITheme.HEADER_FONT, UITheme.TEXT_COLOR
+        ));
+        
+        // Format selection panel
+        JPanel formatPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 15, 10));
+        formatPanel.setBackground(UITheme.CARD_BG);
+        formatPanel.add(new JLabel("Export Format:"));
+        
+        exportFormatCombo = new JComboBox<>(new String[]{"CSV", "JSON"});
+        exportFormatCombo.setBackground(UITheme.CARD_BG);
+        exportFormatCombo.setForeground(UITheme.TEXT_COLOR);
+        exportFormatCombo.setFont(UITheme.NORMAL_FONT);
+        formatPanel.add(exportFormatCombo);
+        
+        // Buttons panel
+        JPanel buttonPanel = new JPanel(new GridLayout(2, 2, 10, 10));
+        buttonPanel.setBackground(UITheme.CARD_BG);
+        buttonPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        
+        JButton btnExportAll = createStyledButton("📁 Export All Data", UITheme.SUCCESS_COLOR);
+        JButton btnExportCustomers = createStyledButton("👥 Export Customers Only", UITheme.PRIMARY_COLOR);
+        JButton btnExportRooms = createStyledButton("🛏️ Export Rooms Only", UITheme.PRIMARY_COLOR);
+        JButton btnExportEmployees = createStyledButton("👔 Export Employees Only", UITheme.PRIMARY_COLOR);
+        
+        btnExportAll.addActionListener(e -> exportAllData());
+        btnExportCustomers.addActionListener(e -> exportCustomersOnly());
+        btnExportRooms.addActionListener(e -> exportRoomsOnly());
+        btnExportEmployees.addActionListener(e -> exportEmployeesOnly());
+        
+        buttonPanel.add(btnExportAll);
+        buttonPanel.add(btnExportCustomers);
+        buttonPanel.add(btnExportRooms);
+        buttonPanel.add(btnExportEmployees);
+        
+        // Info panel
+        JTextArea infoArea = new JTextArea();
+        infoArea.setBackground(UITheme.CARD_BG);
+        infoArea.setForeground(UITheme.TEXT_COLOR);
+        infoArea.setFont(UITheme.SMALL_FONT);
+        infoArea.setEditable(false);
+        infoArea.setText(
+            "💡 Adapter Pattern Information:\n" +
+            "• CSV Format - Compatible with Microsoft Excel, Google Sheets\n" +
+            "• JSON Format - Compatible with Web APIs, Mobile Applications\n" +
+            "• Easy to add new formats (XML, PDF, Excel) without changing existing code\n" +
+            "• The adapter pattern bridges our internal data with external formats"
+        );
+        infoArea.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        
+        exportMainPanel.add(formatPanel, BorderLayout.NORTH);
+        exportMainPanel.add(buttonPanel, BorderLayout.CENTER);
+        exportMainPanel.add(infoArea, BorderLayout.SOUTH);
+        
+        // Combine tabs and export panel
+        JPanel rightPanel = new JPanel(new BorderLayout());
+        rightPanel.add(tabbedPane, BorderLayout.CENTER);
+        rightPanel.add(exportMainPanel, BorderLayout.SOUTH);
         
         panel.add(title, BorderLayout.NORTH);
-        panel.add(tabbedPane, BorderLayout.CENTER);
-        panel.add(exportPanel, BorderLayout.SOUTH);
+        panel.add(rightPanel, BorderLayout.CENTER);
         
         return panel;
+    }
+    
+    // ADAPTER PATTERN METHODS
+    
+    private void exportAllData() 
+    {
+        String format = (String) exportFormatCombo.getSelectedItem();
+        
+        // Select appropriate adapter
+        if (format.equals("CSV")) {
+            exportManager.setExporter(new CSVAdapter());
+        } else {
+            exportManager.setExporter(new JSONAdapter());
+        }
+        
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setDialogTitle("Export All Data - Select Location");
+        fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        
+        int result = fileChooser.showSaveDialog(this);
+        if (result == JFileChooser.APPROVE_OPTION) {
+            String path = fileChooser.getSelectedFile().getAbsolutePath();
+            
+            // Show progress dialog
+            JDialog progressDialog = new JDialog(this, "Exporting Data", true);
+            JLabel progressLabel = new JLabel("Exporting data using " + exportManager.getCurrentFormat() + "...");
+            progressLabel.setHorizontalAlignment(SwingConstants.CENTER);
+            progressDialog.add(progressLabel);
+            progressDialog.setSize(300, 100);
+            progressDialog.setLocationRelativeTo(this);
+            
+            // Export in background thread
+            new Thread(() -> {
+                try {
+                    exportManager.exportAllData(path);
+                    SwingUtilities.invokeLater(() -> {
+                        progressDialog.dispose();
+                        JOptionPane.showMessageDialog(this,
+                            "✅ All data exported successfully!\n\n" +
+                            "Format: " + exportManager.getCurrentFormat() + "\n" +
+                            "Location: " + path + "\n\n" +
+                            "Files created:\n" +
+                            "• " + path + "_customers." + format.toLowerCase() + "\n" +
+                            "• " + path + "_rooms." + format.toLowerCase() + "\n" +
+                            "• " + path + "_employees." + format.toLowerCase() + "\n" +
+                            "• " + path + "_reservations." + format.toLowerCase(),
+                            "Export Complete",
+                            JOptionPane.INFORMATION_MESSAGE);
+                        statusLabel.setText(" Export completed: " + new Date());
+                    });
+                } catch (Exception ex) {
+                    SwingUtilities.invokeLater(() -> {
+                        progressDialog.dispose();
+                        JOptionPane.showMessageDialog(this,
+                            "❌ Export failed: " + ex.getMessage(),
+                            "Export Error",
+                            JOptionPane.ERROR_MESSAGE);
+                    });
+                }
+            }).start();
+            
+            progressDialog.setVisible(true);
+        }
+    }
+    
+    private void exportCustomersOnly() 
+    {
+        String format = (String) exportFormatCombo.getSelectedItem();
+        
+        if (format.equals("CSV")) {
+            exportManager.setExporter(new CSVAdapter());
+        } else {
+            exportManager.setExporter(new JSONAdapter());
+        }
+        
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setDialogTitle("Export Customers - Select Location");
+        fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        
+        int result = fileChooser.showSaveDialog(this);
+        if (result == JFileChooser.APPROVE_OPTION) {
+            String path = fileChooser.getSelectedFile().getAbsolutePath();
+            ArrayList<Customer> customers = fileUtil.load("customers.dat");
+            
+            DataExporter exporter = exportManager.getExporter();
+            exporter.exportCustomers(customers, path);
+            
+            JOptionPane.showMessageDialog(this,
+                "✅ Customers exported successfully!\n\n" +
+                "Format: " + format + "\n" +
+                "Customers exported: " + customers.size() + "\n" +
+                "Location: " + path + "_customers." + format.toLowerCase(),
+                "Export Complete",
+                JOptionPane.INFORMATION_MESSAGE);
+            statusLabel.setText(" Exported " + customers.size() + " customers");
+        }
+    }
+    
+    private void exportRoomsOnly() 
+    {
+        String format = (String) exportFormatCombo.getSelectedItem();
+        
+        if (format.equals("CSV")) {
+            exportManager.setExporter(new CSVAdapter());
+        } else {
+            exportManager.setExporter(new JSONAdapter());
+        }
+        
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setDialogTitle("Export Rooms - Select Location");
+        fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        
+        int result = fileChooser.showSaveDialog(this);
+        if (result == JFileChooser.APPROVE_OPTION) {
+            String path = fileChooser.getSelectedFile().getAbsolutePath();
+            ArrayList<HotelRoom> rooms = fileUtil.load("rooms.dat");
+            
+            DataExporter exporter = exportManager.getExporter();
+            exporter.exportRooms(rooms, path);
+            
+            JOptionPane.showMessageDialog(this,
+                "✅ Rooms exported successfully!\n\n" +
+                "Format: " + format + "\n" +
+                "Rooms exported: " + rooms.size() + "\n" +
+                "Location: " + path + "_rooms." + format.toLowerCase(),
+                "Export Complete",
+                JOptionPane.INFORMATION_MESSAGE);
+            statusLabel.setText(" Exported " + rooms.size() + " rooms");
+        }
+    }
+    
+    private void exportEmployeesOnly() 
+    {
+        String format = (String) exportFormatCombo.getSelectedItem();
+        
+        if (format.equals("CSV")) {
+            exportManager.setExporter(new CSVAdapter());
+        } else {
+            exportManager.setExporter(new JSONAdapter());
+        }
+        
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setDialogTitle("Export Employees - Select Location");
+        fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        
+        int result = fileChooser.showSaveDialog(this);
+        if (result == JFileChooser.APPROVE_OPTION) {
+            String path = fileChooser.getSelectedFile().getAbsolutePath();
+            ArrayList<Employee> employees = fileUtil.load("employees.dat");
+            
+            DataExporter exporter = exportManager.getExporter();
+            exporter.exportEmployees(employees, path);
+            
+            JOptionPane.showMessageDialog(this,
+                "✅ Employees exported successfully!\n\n" +
+                "Format: " + format + "\n" +
+                "Employees exported: " + employees.size() + "\n" +
+                "Location: " + path + "_employees." + format.toLowerCase(),
+                "Export Complete",
+                JOptionPane.INFORMATION_MESSAGE);
+            statusLabel.setText(" Exported " + employees.size() + " employees");
+        }
     }
     
     private JPanel createFinancialReport() 
@@ -386,7 +641,6 @@ public class AdminDashboard extends JFrame
         JPanel panel = new JPanel(new BorderLayout());
         panel.setBackground(UITheme.CARD_BG);
         
-      
         ArrayList<Customer> customers = fileUtil.load("customers.dat");
         ArrayList<HotelRoom> rooms = fileUtil.load("rooms.dat");
         
@@ -426,7 +680,6 @@ public class AdminDashboard extends JFrame
         JPanel panel = new JPanel(new BorderLayout());
         panel.setBackground(UITheme.CARD_BG);
         
-        // Use fileUtil instance
         ArrayList<HotelRoom> rooms = fileUtil.load("rooms.dat");
         
         int totalRooms = rooms.size();
@@ -458,29 +711,28 @@ public class AdminDashboard extends JFrame
         
         double occupancyRate = totalRooms > 0 ? (occupiedRooms * 100.0) / totalRooms : 0;
         
-        String reportText = String.format(
-            "OCCUPANCY REPORT\n" +
-            "================\n\n" +
-            "Total Rooms: %d\n" +
-            "Available Rooms: %d\n" +
-            "Occupied Rooms: %d\n" +
-            "Occupancy Rate: %.1f%%\n" +
-            "Clean Rooms: %d\n" +
-            "Rooms Needing Cleaning: %d\n\n" +
-            "Room Status:\n",
-            totalRooms, availableRooms, occupiedRooms, occupancyRate, cleanRooms, dirtyRooms
-        );
+        StringBuilder reportText = new StringBuilder();
+        reportText.append("OCCUPANCY REPORT\n");
+        reportText.append("================\n\n");
+        reportText.append("Total Rooms: ").append(totalRooms).append("\n");
+        reportText.append("Available Rooms: ").append(availableRooms).append("\n");
+        reportText.append("Occupied Rooms: ").append(occupiedRooms).append("\n");
+        reportText.append("Occupancy Rate: ").append(String.format("%.1f", occupancyRate)).append("%\n");
+        reportText.append("Clean Rooms: ").append(cleanRooms).append("\n");
+        reportText.append("Rooms Needing Cleaning: ").append(dirtyRooms).append("\n\n");
+        reportText.append("Room Status:\n");
+        reportText.append("------------\n");
         
         for (HotelRoom room : rooms) 
         {
-            reportText += String.format("Room %d: %s, %s\n",
+            reportText.append(String.format("Room %d: %s, %s\n",
                 room.roomNo,
                 room.available ? "Available" : "Occupied",
                 room.cleaned ? "Clean" : "Needs Cleaning"
-            );
+            ));
         }
         
-        JTextArea reportArea = new JTextArea(reportText);
+        JTextArea reportArea = new JTextArea(reportText.toString());
         reportArea.setBackground(UITheme.CARD_BG);
         reportArea.setForeground(UITheme.TEXT_COLOR);
         reportArea.setFont(UITheme.SMALL_FONT);
@@ -495,30 +747,31 @@ public class AdminDashboard extends JFrame
         JPanel panel = new JPanel(new BorderLayout());
         panel.setBackground(UITheme.CARD_BG);
         
-        // Use fileUtil instance
         ArrayList<Employee> employees = fileUtil.load("employees.dat");
         
-        String reportText = "EMPLOYEE REPORT\n" +
-                           "================\n\n" +
-                           "Total Employees: " + employees.size() + "\n\n";
+        StringBuilder reportText = new StringBuilder();
+        reportText.append("EMPLOYEE REPORT\n");
+        reportText.append("================\n\n");
+        reportText.append("Total Employees: ").append(employees.size()).append("\n\n");
         
         if (employees.isEmpty()) 
         {
-            reportText += "No employees registered.\n";
+            reportText.append("No employees registered.\n");
         } 
         else 
         {
-            reportText += "Employee Details:\n";
+            reportText.append("Employee Details:\n");
+            reportText.append("----------------\n");
             for (Employee emp : employees) 
             {
-                reportText += String.format(
+                reportText.append(String.format(
                     "ID: %d, Name: %s, Dept: %s, Salary: $%.2f\n",
                     emp.getId(), emp.getName(), emp.getDepartment(), emp.getSalary()
-                );
+                ));
             }
         }
         
-        JTextArea reportArea = new JTextArea(reportText);
+        JTextArea reportArea = new JTextArea(reportText.toString());
         reportArea.setBackground(UITheme.CARD_BG);
         reportArea.setForeground(UITheme.TEXT_COLOR);
         reportArea.setFont(UITheme.SMALL_FONT);
@@ -530,7 +783,6 @@ public class AdminDashboard extends JFrame
     
     private int getAvailableRoomCount() 
     {
-        // Use fileUtil instance
         ArrayList<HotelRoom> rooms = fileUtil.load("rooms.dat");
         int count = 0;
         for (HotelRoom room : rooms) 
@@ -545,7 +797,6 @@ public class AdminDashboard extends JFrame
     
     private double calculateOccupancyRate() 
     {
-        // Use fileUtil instance
         ArrayList<HotelRoom> rooms = fileUtil.load("rooms.dat");
         if (rooms.isEmpty()) return 0;
         
@@ -559,6 +810,7 @@ public class AdminDashboard extends JFrame
         }
         return (occupied * 100.0) / rooms.size();
     }
+    
     private JPanel createSettingsPanel() 
     {
         JPanel panel = new JPanel(new BorderLayout());
@@ -575,13 +827,15 @@ public class AdminDashboard extends JFrame
         gbc.insets = new Insets(10, 10, 10, 10);
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.anchor = GridBagConstraints.WEST;
+        
         gbc.gridx = 0; gbc.gridy = 0;
         settingsForm.add(createSettingsLabel("Hotel Name:"), gbc);
         gbc.gridx = 1;
         JTextField hotelNameField = new JTextField("Grand Hotel");
         hotelNameField.setBackground(UITheme.CARD_BG);
         hotelNameField.setForeground(UITheme.TEXT_COLOR);
-        settingsForm.add(hotelNameField, gbc);  
+        settingsForm.add(hotelNameField, gbc);
+        
         gbc.gridx = 0; gbc.gridy = 1;
         settingsForm.add(createSettingsLabel("Admin Email:"), gbc);
         gbc.gridx = 1;
@@ -589,13 +843,15 @@ public class AdminDashboard extends JFrame
         emailField.setBackground(UITheme.CARD_BG);
         emailField.setForeground(UITheme.TEXT_COLOR);
         settingsForm.add(emailField, gbc);
+        
         gbc.gridx = 0; gbc.gridy = 2;
         settingsForm.add(createSettingsLabel("Backup Frequency:"), gbc);
         gbc.gridx = 1;
         JComboBox<String> backupCombo = new JComboBox<>(new String[]{"Daily", "Weekly", "Monthly"});
         backupCombo.setBackground(UITheme.CARD_BG);
         backupCombo.setForeground(UITheme.TEXT_COLOR);
-        settingsForm.add(backupCombo, gbc); 
+        settingsForm.add(backupCombo, gbc);
+        
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         buttonPanel.setBackground(UITheme.CARD_BG);
         JButton btnSave = createStyledButton("Save Settings", UITheme.SUCCESS_COLOR);
