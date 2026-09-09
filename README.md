@@ -322,15 +322,8 @@ Distributed under the **MIT License**. See [`LICENSE`](LICENSE) for details.
 [Report Bug](../../issues) · [Request Feature](../../issues) · [Documentation](../../wiki)
 
 </div>
-Here are the visuals of Hotel Management System in action:
-![image alt](https://raw.githubusercontent.com/ttahsin124-wq/Java-project-Hotel-Management-System-/22acdc5493703e052107e2b72b72e7b28c2f9344/Screenshot%202026-01-15%20214000.png)
-![image alt](https://github.com/ttahsin124-wq/Java-project-Hotel-Management-System-/blob/main/Screenshot%202026-01-15%20214022.png?raw=true)
-![image alt](https://github.com/ttahsin124-wq/Java-project-Hotel-Management-System-/blob/main/Screenshot%202026-01-15%20214046.png?raw=true)
-![image alt](https://github.com/ttahsin124-wq/Java-project-Hotel-Management-System-/blob/main/Screenshot%202026-01-15%20214103.png?raw=true)
-![image alt](https://github.com/ttahsin124-wq/Java-project-Hotel-Management-System-/blob/main/Screenshot%202026-01-15%20214120.png?raw=true)
-![image alt](https://github.com/ttahsin124-wq/Java-project-Hotel-Management-System-/blob/main/Screenshot%202026-01-15%20214138.png?raw=true)
-![image alt](https://github.com/ttahsin124-wq/Java-project-Hotel-Management-System-/blob/main/Screenshot%202026-01-15%20214153.png?raw=true)
-![image alt](https://github.com/ttahsin124-wq/Java-project-Hotel-Management-System-/blob/main/Screenshot%202026-01-15%20214206.png?raw=true)
+
+
 
 
 
